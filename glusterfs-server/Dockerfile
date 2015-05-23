@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-MAINTAINER Cleawing <inception@cleawing.com>
+MAINTAINER Cleawing Inception <inception@cleawing.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 

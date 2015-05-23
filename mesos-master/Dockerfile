@@ -1,5 +1,5 @@
-FROM cleawing/mesos:0.22.0
-MAINTAINER Cleawing <mesos@cleawing.com>
+FROM cleawing/mesos:0.22.1
+MAINTAINER Cleawing Inception <inception@cleawing.com>
 
 VOLUME /var/lib/mesos
 
