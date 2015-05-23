@@ -1,7 +1,10 @@
-FROM ubuntu:15.04
+FROM ubuntu:14.04.2
 MAINTAINER Cleawing Inception <inception@cleawing.com>
 
-RUN echo "deb http://repos.mesosphere.io/ubuntu/ trusty main" > /etc/apt/sources.list.d/mesosphere.list
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv DF7D54CBE56151BF && \
-	apt-get -y update && \
-	apt-get -y install mesos=0.22.1-1.0.ubuntu1404
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]'); CODENAME=$(lsb_release -cs); echo "deb http://repos.mesosphere.io/${DISTRO} ${CODENAME} main" | tee /etc/apt/sources.list.d/mesosphere.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
+RUN	apt-get -q update
+RUN	apt-get -y -q install mesos=0.22.1-1.0.ubuntu1404
+RUN apt-get clean -y -q
