@@ -1,0 +1,1 @@
+- include: playbooks/bootstrap_coreos.yml

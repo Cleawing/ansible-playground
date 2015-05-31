@@ -7,13 +7,13 @@ $new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
 # To automatically replace the discovery token on 'vagrant up', uncomment
 # the lines below:
 #
-if File.exists?('user-data') && ARGV[0].eql?('up')
+if File.exists?('user-data.template') && ARGV[0].eql?('up')
   require 'open-uri'
   require 'yaml'
 
   token = open($new_discovery_url).read
 
-  data = YAML.load(IO.readlines('user-data')[1..-1].join)
+  data = YAML.load(IO.readlines('user-data.template')[1..-1].join)
   if data['coreos'].key? 'etcd'
     data['coreos']['etcd']['discovery'] = token
   end

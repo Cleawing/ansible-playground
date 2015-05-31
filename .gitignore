@@ -1,0 +1,3 @@
+.vagrant/*
+user-data
+playbooks/roles/defunctzombie.coreos-bootstrap/*

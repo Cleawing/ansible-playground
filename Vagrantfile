@@ -43,6 +43,12 @@ def vm_cpus
   $vb_cpus.nil? ? $vm_cpus : $vb_cpus
 end
 
+system("
+    if [ #{ARGV[0]} = 'up' ]; then
+        ansible-galaxy install defunctzombie.coreos-bootstrap -p ./playbooks/roles --force
+    fi
+")
+
 Vagrant.configure("2") do |config|
   # always use Vagrants insecure key
   config.ssh.insert_key = false
@@ -67,6 +73,14 @@ Vagrant.configure("2") do |config|
   # plugin conflict
   if Vagrant.has_plugin?("vagrant-vbguest") then
     config.vbguest.auto_update = false
+  end
+  
+  config.vm.provision "ansible" do |ansible|
+    ansible.groups = {
+      "coreos" => (1..$num_instances).map { |i| "%s-%02d" % [$instance_name_prefix, i] },
+      "all_groups:children" => ["coreos"]
+    }
+    ansible.playbook = "cluster.yml"
   end
 
   (1..$num_instances).each do |i|
@@ -134,7 +148,6 @@ Vagrant.configure("2") do |config|
         config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
         config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true
       end
-
     end
   end
 end
