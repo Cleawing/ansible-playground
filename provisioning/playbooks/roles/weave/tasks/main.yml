@@ -1,0 +1,32 @@
+---
+- name: Copy 10-weave.network
+  sudo: yes
+  copy: src=10-weave.network dest=/etc/systemd/network/10-weave.network
+
+- name: Reload Network
+  sudo: yes
+  service: name=systemd-networkd state=restarted
+
+- name: Copy install-weave.service
+  sudo: yes
+  copy: src=install-weave.service dest=/etc/systemd/system/install-weave.service
+  
+- name: Copy weave.service
+  sudo: yes
+  copy: src=weave.service dest=/etc/systemd/system/weave.service
+      
+- name: Reload systemd
+  sudo: yes
+  command: systemctl daemon-reload
+   
+- name: Enable install-weave.service
+  sudo: yes
+  service: name=install-weave enabled=yes state=started
+      
+- name: Setup weave
+  sudo: yes
+  command: /opt/bin/weave setup
+  
+- name: Enable weave.service
+  sudo: yes
+  service: name=weave enabled=yes state=started  

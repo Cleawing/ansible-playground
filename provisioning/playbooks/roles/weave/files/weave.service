@@ -1,0 +1,12 @@
+[Unit]
+After=install-weave.service
+Description=Weave Network
+Documentation=http://docs.weave.works/
+Requires=install-weave.service
+
+[Service]
+Restart=always
+ExecStartPre=/opt/bin/weave launch
+ExecStart=/usr/bin/docker logs -f weave
+SuccessExitStatus=2
+ExecStop=/opt/bin/weave stop

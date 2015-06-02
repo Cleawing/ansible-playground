@@ -1,0 +1,4 @@
+- name: Install and configure Weave Network
+  hosts: coreos
+  roles:
+    - weave
