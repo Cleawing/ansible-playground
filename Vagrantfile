@@ -45,7 +45,7 @@ end
 
 system("
     if [ #{ARGV[0]} = 'up' ]; then
-        ansible-galaxy install defunctzombie.coreos-bootstrap -p ./playbooks/roles --force
+        ansible-galaxy install defunctzombie.coreos-bootstrap -p ./provisioning/playbooks/roles --force
     fi
 ")
 
@@ -80,7 +80,7 @@ Vagrant.configure("2") do |config|
       "coreos" => (1..$num_instances).map { |i| "%s-%02d" % [$instance_name_prefix, i] },
       "all_groups:children" => ["coreos"]
     }
-    ansible.playbook = "cluster.yml"
+    ansible.playbook = "provisioning/cluster.yml"
   end
 
   (1..$num_instances).each do |i|
