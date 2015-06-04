@@ -1,0 +1,1 @@
+weave_password: "{{ lookup('password', '../../../credentials/weave_password') | hash('sha512') }}"

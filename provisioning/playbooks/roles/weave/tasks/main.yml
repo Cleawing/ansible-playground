@@ -2,10 +2,12 @@
 - name: Copy 10-weave.network
   sudo: yes
   copy: src=10-weave.network dest=/etc/systemd/network/10-weave.network
+  register: weave_network
 
-- name: Reload Network
+- name: Restart Network
   sudo: yes
   service: name=systemd-networkd state=restarted
+  when: weave_network.changed
   
 - name: Copy install-weave.service
   sudo: yes
@@ -14,29 +16,32 @@
 - name: Copy weave.service
   sudo: yes
   copy: src=weave.service dest=/etc/systemd/system/weave.service
+  register: weave_service
+  
+- name: Enable install-weave.service
+  sudo: yes
+  service: name=install-weave enabled=yes state=started
+  register: weave_install
+  
+- name: Setup Weave
+  sudo: yes
+  command: /opt/bin/weave setup
+  when: weave_install.changed
       
-- name: Reload systemd
+- name: Reload SystemD
   sudo: yes
   command: systemctl daemon-reload
-
-#- name: Display all variables/facts known for a host
-#  debug: var=hostvars['core-01']
+  when: weave_service.changed
 
 - name: Upload /etc/weave.env template
   sudo: yes
   template:
     src: weave.env.j2
     dest: "/etc/weave.env"
-    mode: 0644
-     
-- name: Enable install-weave.service
-  sudo: yes
-  service: name=install-weave enabled=yes state=started
-      
-- name: Setup weave
-  sudo: yes
-  command: /opt/bin/weave setup
+    mode: 0600
+  register: weave_env
   
-- name: Enable weave.service
+- name: Start/Restart weave.service
   sudo: yes
-  service: name=weave enabled=yes state=restarted  
+  service: name=weave enabled=yes state=restarted
+  when: weave_env.changed or weave_service.changed
