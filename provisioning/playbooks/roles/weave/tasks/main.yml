@@ -6,7 +6,7 @@
 - name: Reload Network
   sudo: yes
   service: name=systemd-networkd state=restarted
-
+  
 - name: Copy install-weave.service
   sudo: yes
   copy: src=install-weave.service dest=/etc/systemd/system/install-weave.service
@@ -18,7 +18,17 @@
 - name: Reload systemd
   sudo: yes
   command: systemctl daemon-reload
-   
+
+#- name: Display all variables/facts known for a host
+#  debug: var=hostvars['core-01']
+
+- name: Upload /etc/weave.env template
+  sudo: yes
+  template:
+    src: weave.env.j2
+    dest: "/etc/weave.env"
+    mode: 0644
+     
 - name: Enable install-weave.service
   sudo: yes
   service: name=install-weave enabled=yes state=started
@@ -29,4 +39,4 @@
   
 - name: Enable weave.service
   sudo: yes
-  service: name=weave enabled=yes state=started  
+  service: name=weave enabled=yes state=restarted  

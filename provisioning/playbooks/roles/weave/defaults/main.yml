@@ -1,2 +1,11 @@
 ---
-# defaults file for provisioning/playbooks/roles/weave
+weave_server_group: weave_nodes
+weave_launch_peers: "
+  {%- set weave_peers = [] -%}
+  {%- for host in groups[weave_server_group] -%}
+    {%- if host != inventory_hostname and host not in weave_peers -%}
+      {% do weave_peers.append(hostvars[host]['ansible_eth1']['ipv4']['address']) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ weave_peers|join(' ') }}
+"

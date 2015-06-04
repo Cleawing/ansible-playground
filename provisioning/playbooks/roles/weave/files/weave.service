@@ -6,7 +6,8 @@ Requires=install-weave.service
 
 [Service]
 Restart=always
-ExecStartPre=/opt/bin/weave launch
+EnvironmentFile=/etc/weave.env
+ExecStartPre=/opt/bin/weave launch $WEAVE_LAUNCH_PEERS
 ExecStart=/usr/bin/docker logs -f weave
 SuccessExitStatus=2
 ExecStop=/opt/bin/weave stop

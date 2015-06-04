@@ -75,14 +75,6 @@ Vagrant.configure("2") do |config|
     config.vbguest.auto_update = false
   end
   
-  config.vm.provision "ansible" do |ansible|
-    ansible.groups = {
-      "coreos" => (1..$num_instances).map { |i| "%s-%02d" % [$instance_name_prefix, i] },
-      "all_groups:children" => ["coreos"]
-    }
-    ansible.playbook = "provisioning/cluster.yml"
-  end
-
   (1..$num_instances).each do |i|
     config.vm.define vm_name = "%s-%02d" % [$instance_name_prefix, i] do |config|
       config.vm.hostname = vm_name
@@ -147,6 +139,18 @@ Vagrant.configure("2") do |config|
       if File.exist?(CLOUD_CONFIG_PATH)
         config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
         config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true
+      end
+      
+      if vm_name == "%s-%02d" % [$instance_name_prefix, $num_instances]
+        config.vm.provision "ansible" do |ansible|
+          ansible.limit = 'all'
+          ansible.groups = {
+            "coreos" => (1..$num_instances).map { |i| "%s-%02d" % [$instance_name_prefix, i] },
+            "all_groups:children" => ["coreos"],
+            "weave_nodes:children" => ["coreos"]
+          }
+          ansible.playbook = "provisioning/cluster.yml"
+        end
       end
     end
   end
