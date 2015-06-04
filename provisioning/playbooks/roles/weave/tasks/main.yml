@@ -2,46 +2,37 @@
 - name: Copy 10-weave.network
   sudo: yes
   copy: src=10-weave.network dest=/etc/systemd/network/10-weave.network
-  register: weave_network
+  notify:
+  - Restart Network
 
-- name: Restart Network
+- name: Assure /etc/systemd/system/docker.service.d exists
   sudo: yes
-  service: name=systemd-networkd state=restarted
-  when: weave_network.changed
+  file: path=/etc/systemd/system/docker.service.d state=directory
   
+- name: Drop-in 10-docker-disable-icc.conf
+  sudo: yes
+  copy: src=10-docker-disable-icc.conf dest=/etc/systemd/system/docker.service.d/10-docker-disable-icc.conf
+  notify:
+  - Restart Docker
+    
 - name: Copy install-weave.service
   sudo: yes
   copy: src=install-weave.service dest=/etc/systemd/system/install-weave.service
+  notify:
+  - Reload SystemD
   
 - name: Copy weave.service
   sudo: yes
   copy: src=weave.service dest=/etc/systemd/system/weave.service
-  register: weave_service
-  
-- name: Enable install-weave.service
-  sudo: yes
-  service: name=install-weave enabled=yes state=started
-  register: weave_install
-  
-- name: Setup Weave
-  sudo: yes
-  command: /opt/bin/weave setup
-  when: weave_install.changed
-      
-- name: Reload SystemD
-  sudo: yes
-  command: systemctl daemon-reload
-  when: weave_service.changed
-
+  notify:
+  - Reload SystemD
+  - Restart Weave
+          
 - name: Upload /etc/weave.env template
   sudo: yes
   template:
     src: weave.env.j2
     dest: "/etc/weave.env"
     mode: 0600
-  register: weave_env
-  
-- name: Start/Restart weave.service
-  sudo: yes
-  service: name=weave enabled=yes state=restarted
-  when: weave_env.changed or weave_service.changed
+  notify:
+  - Restart Weave

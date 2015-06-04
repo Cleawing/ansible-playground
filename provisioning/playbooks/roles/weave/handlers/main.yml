@@ -1,2 +1,16 @@
 ---
-# handlers file for provisioning/playbooks/roles/weave
+- name: Reload SystemD
+  sudo: yes
+  command: systemctl daemon-reload
+  
+- name: Restart Network
+  sudo: yes
+  service: name=systemd-networkd state=restarted
+
+- name: Restart Docker
+  sudo: yes
+  service: name=docker state=restarted
+  
+- name: Restart Weave
+  sudo: yes
+  service: name=weave enabled=yes state=restarted
