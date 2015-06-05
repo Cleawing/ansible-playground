@@ -1,0 +1,8 @@
+[Unit]
+Description=Weave Network Setup Complete
+Documentation=man:systemd.special(7)
+RefuseManualStart=no
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target

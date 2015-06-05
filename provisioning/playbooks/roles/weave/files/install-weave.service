@@ -1,10 +1,11 @@
 [Unit]
 After=network-online.target
+Before=weave.service
 After=docker.service
 Description=Install Weave
 Documentation=http://docs.weave.works/
-Requires=network-online.target
 Requires=docker.service
+Requires=network-online.target
 
 [Service]
 Type=oneshot
@@ -17,5 +18,13 @@ ExecStartPre=/usr/bin/chmod +x /opt/bin/weave
 ExecStartPre=/usr/bin/docker pull weaveworks/weave:latest
 ExecStartPre=/usr/bin/docker pull weaveworks/weavedns:latest
 ExecStartPre=/usr/bin/docker pull weaveworks/weaveexec:latest
+ExecStartPre=-/opt/bin/weave stop
+ExecStartPre=/opt/bin/weave setup
+ExecStartPre=/opt/bin/weave launch
+ExecStartPre=/opt/bin/weave stop
+
 ExecStart=/bin/echo Weave Installed
-ExecStartPost=/opt/bin/weave setup
+
+[Install]
+WantedBy=weave-network.target
+WantedBy=weave.service

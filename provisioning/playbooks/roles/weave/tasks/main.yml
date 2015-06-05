@@ -1,38 +1,92 @@
 ---
 - name: Copy 10-weave.network
   sudo: yes
-  copy: src=10-weave.network dest=/etc/systemd/network/10-weave.network
-  notify:
-  - Restart Network
+  copy:
+    src: 10-weave.network
+    dest: /etc/systemd/network/10-weave.network
+  register: weave_network
 
-- name: Assure /etc/systemd/system/docker.service.d exists
+- name: Restart Network
   sudo: yes
-  file: path=/etc/systemd/system/docker.service.d state=directory
+  service:
+    name: systemd-networkd
+    state: restarted
+  when: weave_network.changed
   
-- name: Drop-in 10-docker-disable-icc.conf
+- name: Copy weave-network.target
   sudo: yes
-  copy: src=10-docker-disable-icc.conf dest=/etc/systemd/system/docker.service.d/10-docker-disable-icc.conf
-  notify:
-  - Restart Docker
-    
+  copy:
+    src: weave-network.target
+    dest: /etc/systemd/system/weave-network.target
+  register: weave_network_target
+      
 - name: Copy install-weave.service
   sudo: yes
-  copy: src=install-weave.service dest=/etc/systemd/system/install-weave.service
-  notify:
-  - Reload SystemD
+  copy:
+    src: install-weave.service
+    dest: /etc/systemd/system/install-weave.service
+  register: install_weave_service
   
 - name: Copy weave.service
   sudo: yes
-  copy: src=weave.service dest=/etc/systemd/system/weave.service
-  notify:
-  - Reload SystemD
-  - Restart Weave
-          
+  copy:
+    src: weave.service
+    dest: /etc/systemd/system/weave.service
+  register: weave_service
+
 - name: Upload /etc/weave.env template
   sudo: yes
   template:
     src: weave.env.j2
     dest: "/etc/weave.env"
     mode: 0600
-  notify:
-  - Restart Weave
+  register: weave_env
+
+- name: Reload SystemD
+  sudo: yes
+  command: systemctl daemon-reload
+  when: weave_network_target.changed or install_weave_service.changed or weave_service.changed
+
+- name: Check Weave bridge
+  raw: stat /sys/class/net/weave
+  register: need_weave_bridge
+  ignore_errors: True
+  
+- name: Install Weave
+  sudo: yes
+  service:
+    enabled: yes
+    name: install-weave
+    state: started
+  when: need_weave_bridge | failed
+          
+- name: Assure /etc/systemd/system/docker.service.d exists
+  sudo: yes
+  file: path=/etc/systemd/system/docker.service.d state=directory
+      
+- name: Inject Weave bridge into Docker
+  sudo: yes
+  template:
+    src: 10-docker-weave-bridge.conf.j2
+    dest: /etc/systemd/system/docker.service.d/10-docker-weave-bridge.conf
+  register: docker_weave_bridge_conf
+
+- name: Reload SystemD
+  sudo: yes
+  command: systemctl daemon-reload
+  when: docker_weave_bridge_conf.changed
+      
+- name: Restart Docker
+  sudo: yes
+  service:
+    name: docker
+    state: restarted
+  when: weave_env.changed or docker_weave_bridge_conf.changed
+  
+- name: Restart Weave
+  sudo: yes
+  service:
+    enabled: yes
+    name: weave
+    state: restarted
+  when: install_weave_service.changed or weave_env.changed or weave_service.changed or docker_weave_bridge_conf.changed
