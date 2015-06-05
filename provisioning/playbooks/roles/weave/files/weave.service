@@ -11,6 +11,7 @@ Restart=always
 RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/weave.env
+ExecStartPre=-/opt/bin/weave stop
 ExecStartPre=/opt/bin/weave launch $WEAVE_PEERS
 ExecStart=/usr/bin/docker logs -f weave
 SuccessExitStatus=2
