@@ -42,22 +42,35 @@
     mode: 0600
   register: weave_env
 
+- name: Upload /etc/docker.env template
+  sudo: yes
+  template:
+    src: docker.env.j2
+    dest: "/etc/docker.env"
+    mode: 0600
+  register: docker_env
+  
 - name: Reload SystemD
   sudo: yes
   command: systemctl daemon-reload
   when: weave_network_target.changed or install_weave_service.changed or weave_service.changed
 
-- name: Check Weave bridge
-  raw: stat /sys/class/net/weave
-  register: need_weave_bridge
-  ignore_errors: True
-  
 - name: Install Weave
   sudo: yes
   service:
     enabled: yes
     name: install-weave
     state: started
+  when: install_weave_service | changed
+  
+- name: Check Weave bridge exists
+  raw: stat /sys/class/net/weave
+  register: need_weave_bridge
+  ignore_errors: True
+  
+- name: Create Weave bridge
+  sudo: yes
+  command: /opt/bin/weave create-bridge
   when: need_weave_bridge | failed
           
 - name: Assure /etc/systemd/system/docker.service.d exists
@@ -81,7 +94,7 @@
   service:
     name: docker
     state: restarted
-  when: weave_env.changed or docker_weave_bridge_conf.changed
+  when: docker_env.changed or docker_weave_bridge_conf.changed
   
 - name: Restart Weave
   sudo: yes
@@ -89,4 +102,4 @@
     enabled: yes
     name: weave
     state: restarted
-  when: install_weave_service.changed or weave_env.changed or weave_service.changed or docker_weave_bridge_conf.changed
+  when: install_weave_service.changed or weave_env.changed or weave_service.changed

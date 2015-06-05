@@ -20,9 +20,6 @@ ExecStartPre=/usr/bin/docker pull weaveworks/weavedns:latest
 ExecStartPre=/usr/bin/docker pull weaveworks/weaveexec:latest
 ExecStartPre=-/opt/bin/weave stop
 ExecStartPre=/opt/bin/weave setup
-ExecStartPre=/opt/bin/weave launch
-ExecStartPre=/opt/bin/weave stop
-
 ExecStart=/bin/echo Weave Installed
 
 [Install]
