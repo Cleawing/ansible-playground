@@ -43,12 +43,6 @@ def vm_cpus
   $vb_cpus.nil? ? $vm_cpus : $vb_cpus
 end
 
-system("
-    if [ #{ARGV[0]} = 'up' ]; then
-        ansible-galaxy install defunctzombie.coreos-bootstrap -p ./provisioning/playbooks/roles --force
-    fi
-")
-
 Vagrant.configure("2") do |config|
   # always use Vagrants insecure key
   config.ssh.insert_key = false

@@ -2,4 +2,4 @@
   hosts: coreos
   gather_facts: False
   roles:
-    - defunctzombie.coreos-bootstrap
+    - coreos-bootstrap
