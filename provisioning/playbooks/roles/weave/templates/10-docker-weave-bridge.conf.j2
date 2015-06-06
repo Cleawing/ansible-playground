@@ -1,7 +1,0 @@
-[Unit]
-Before=weave.service
-Requires=network.target
-
-[Service]
-EnvironmentFile=/etc/docker.env
-ExecStartPre=-/usr/bin/ip addr add dev weave $BRIDGE_ADDRESS_CIDR
