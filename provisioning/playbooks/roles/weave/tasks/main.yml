@@ -33,7 +33,21 @@
     src: weave.service
     dest: /etc/systemd/system/weave.service
   register: weave_service
+  
+- name: Copy weave-dns.service
+  sudo: yes
+  copy:
+    src: weave-dns.service
+    dest: /etc/systemd/system/weave-dns.service
+  register: weave_dns
 
+- name: Copy weave-proxy.service
+  sudo: yes
+  copy:
+    src: weave-proxy.service
+    dest: /etc/systemd/system/weave-proxy.service
+  register: weave_proxy
+  
 - name: Upload /etc/weave.env template
   sudo: yes
   template:
@@ -53,7 +67,7 @@
 - name: Reload SystemD
   sudo: yes
   command: systemctl daemon-reload
-  when: weave_network_target.changed or install_weave_service.changed or weave_service.changed
+  when: weave_network_target.changed or install_weave_service.changed or weave_service.changed or weave_dns.changed or weave_proxy.changed
 
 - name: Install Weave
   sudo: yes
@@ -96,10 +110,34 @@
     state: restarted
   when: docker_env.changed or docker_weave_bridge_conf.changed
   
-- name: Restart Weave
+- name: Restart Weave Router
   sudo: yes
   service:
     enabled: yes
     name: weave
     state: restarted
   when: install_weave_service.changed or weave_env.changed or weave_service.changed
+  register: weave_restarted
+  
+- name: Waiting for Weave Router
+  wait_for:
+    port: 6783
+  when: weave_restarted.changed
+  
+- name: Restart Weave DNS
+  sudo: yes
+  service:
+    enabled: yes
+    name: weave-dns
+    state: restarted
+  when: install_weave_service.changed or weave_env.changed or weave_dns.changed
+  ignore_errors: True
+  
+- name: Restart Weave Proxy
+  sudo: yes
+  service:
+    enabled: yes
+    name: weave-proxy
+    state: restarted
+  when: install_weave_service.changed or weave_env.changed or weave_proxy.changed
+  ignore_errors: True

@@ -1,0 +1,19 @@
+[Unit]
+After=weave-dns.service
+Description=Weave Network Router
+Documentation=http://docs.weave.works/
+Requires=weave-dns.service
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=5min
+EnvironmentFile=/etc/weave.env
+ExecStartPre=-/usr/bin/docker rm -f weaveproxy
+ExecStartPre=/opt/bin/weave launch-proxy --with-dns --with-ipam
+ExecStart=/usr/bin/docker logs -f weaveproxy
+SuccessExitStatus=2
+ExecStop=-/usr/bin/docker rm -f weaveproxy
+
+[Install]
+WantedBy=weave-network.target
