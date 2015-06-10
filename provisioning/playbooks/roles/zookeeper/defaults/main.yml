@@ -1,0 +1,19 @@
+---
+zookeeper_server_group: zookeeper_nodes
+zookeeper_node_index: "
+    {%- for host in groups[zookeeper_server_group] -%}
+      {%- if host == 'default' or host == inventory_hostname or host == ansible_fqdn or host in ansible_all_ipv4_addresses -%}
+        {{ loop.index }}
+      {%- endif -%}
+    {%- endfor -%}
+"
+zookeeper_host_name: "{{ zookeeper_node_index }}.zookeeper.weave.local"
+zookeeper_nodes_env: "
+  {%- set zookeeper_peers = [] -%}
+  {%- for host in groups[zookeeper_server_group] -%}
+    {%- if host != inventory_hostname and host not in zookeeper_peers -%}
+      {% do zookeeper_peers.append('ADDITIONAL_ZOOKEEPER_%s=server.%s=%s.zookeeper.weave.local:2888:3888' % (loop.index, loop.index, loop.index,)) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ zookeeper_peers | join(' -e ') }}"
+zookeeper_docker_args: "-e SERVER_ID={{ zookeeper_node_index }} -e {{ zookeeper_nodes_env }}"

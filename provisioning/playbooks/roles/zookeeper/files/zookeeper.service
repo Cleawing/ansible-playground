@@ -1,0 +1,15 @@
+[Unit]
+After=weave-proxy.service
+Description=Zookeeper Node
+Documentation=https://github.com/sekka1/mesosphere-docker
+Requires=weave-proxy.service
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=5min
+EnvironmentFile=/etc/zookeeper.env
+ExecStartPre=-/usr/bin/docker rm -f zookeeper
+ExecStartPre=/usr/bin/docker pull cleawing/zookeeper
+ExecStart=/usr/bin/docker run --name zookeeper -h $ZOOKEEPER_HOST_NAME $ZOOKEEPER_DOCKER_ARGS cleawing/zookeeper
+ExecStop=/usr/bin/docker stop zookeeper

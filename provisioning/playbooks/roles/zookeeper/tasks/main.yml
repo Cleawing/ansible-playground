@@ -1,0 +1,28 @@
+---
+- name: Upload /etc/zookeeper.env template
+  sudo: yes
+  template:
+    src: zookeeper.env.j2
+    dest: /etc/zookeeper.env
+    mode: 0600
+  register: zookeeper_env
+  
+- name: Copy zookeeper.service
+  sudo: yes
+  copy:
+    src: zookeeper.service
+    dest: /etc/systemd/system/zookeeper.service
+  register: zookeeper_service
+  
+- name: Reload SystemD
+  sudo: yes
+  command: systemctl daemon-reload
+  when: zookeeper_service.changed
+
+- name: Restart Zookeper Node
+  sudo: yes
+  service:
+    enabled: yes
+    name: zookeeper
+    state: restarted
+  when: zookeeper_service.changed or zookeeper_env.changed

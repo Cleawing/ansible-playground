@@ -1,3 +1,4 @@
 - include: playbooks/bootstrap_coreos.yml
 - include: playbooks/weave.yml
 - include: playbooks/consul.yml
+- include: playbooks/zookeeper.yml

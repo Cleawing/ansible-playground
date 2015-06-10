@@ -1,8 +1,8 @@
 [Unit]
-After=docker.service
+After=weave-proxy.service
 Description=Consul Agent
 Documentation=https://registry.hub.docker.com/u/progrium/consul/
-Requires=docker.service
+Requires=weave-proxy.service
 
 [Service]
 Restart=always

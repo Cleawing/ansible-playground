@@ -143,6 +143,7 @@ Vagrant.configure("2") do |config|
             "all_groups:children" => ["coreos"],
             "weave_nodes:children" => ["coreos"],
             "consul_nodes:children" => ["coreos"],
+            "zookeeper_nodes:children" => ["coreos"]
           }
           ansible.playbook = "provisioning/cluster.yml"
         end
