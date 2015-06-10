@@ -72,13 +72,16 @@
   command: systemctl daemon-reload
   when: weave_network_target.changed or docker_adjust.changed or install_weave_service.changed or weave_service.changed or weave_dns.changed or weave_proxy.changed
   
-- name: Enable Docker
+- name: Restart Docker
   sudo: yes
   service:
     enabled: yes
     name: docker
     state: restarted
   when: docker_adjust.changed
+  notify:
+  - Waiting for Weave Router
+  - Waiting for Weave Proxy
   
 - name: Install Weave
   sudo: yes
@@ -95,13 +98,10 @@
     name: weave
     state: restarted
   when: install_weave_service.changed or weave_service.changed or weave_env.changed
-  register: weave_restarted
-  
-- name: Waiting for Weave Router
-  wait_for:
-    port: 6783
-  when: weave_restarted.changed
-  
+  notify:
+  - Waiting for Weave Router
+
+# TODO. wait_for for UDP ports (and wait for Weave DNS)
 - name: Restart Weave DNS
   sudo: yes
   service:
@@ -110,7 +110,7 @@
     state: restarted
   when: install_weave_service.changed or weave_service.changed or weave_env.changed or weave_dns.changed
   ignore_errors: True
-  
+
 - name: Restart Weave Proxy
   sudo: yes
   service:
@@ -119,3 +119,6 @@
     state: restarted
   when: install_weave_service.changed or weave_service.changed or weave_env.changed or weave_proxy.changed
   ignore_errors: True
+  notify:
+  - Waiting for Weave Proxy
+  

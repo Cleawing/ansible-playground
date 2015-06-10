@@ -1,16 +1,10 @@
 ---
-- name: Reload SystemD
-  sudo: yes
-  command: systemctl daemon-reload
-  
-- name: Restart Network
-  sudo: yes
-  service: name=systemd-networkd state=restarted
-
-- name: Restart Docker
-  sudo: yes
-  service: name=docker state=restarted
-  
-- name: Restart Weave
-  sudo: yes
-  service: name=weave enabled=yes state=restarted
+- name: Waiting for Weave Router
+  wait_for:
+    port: 6783
+    timeout: 60
+    
+- name: Waiting for Weave Proxy
+  wait_for:
+    port: 12375
+    timeout: 60
