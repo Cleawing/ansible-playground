@@ -141,7 +141,8 @@ Vagrant.configure("2") do |config|
           ansible.groups = {
             "coreos" => (1..$num_instances).map { |i| "%s-%02d" % [$instance_name_prefix, i] },
             "all_groups:children" => ["coreos"],
-            "weave_nodes:children" => ["coreos"]
+            "weave_nodes:children" => ["coreos"],
+            "consul_nodes:children" => ["coreos"],
           }
           ansible.playbook = "provisioning/cluster.yml"
         end

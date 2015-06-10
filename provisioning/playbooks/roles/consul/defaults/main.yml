@@ -1,0 +1,20 @@
+---
+consul_server_group: consul_nodes
+consul_node_index: "
+    {%- for host in groups[consul_server_group] -%}
+      {%- if host == 'default' or host == inventory_hostname or host == ansible_fqdn or host in ansible_all_ipv4_addresses -%}
+        {{ loop.index }}
+      {%- endif -%}
+    {%- endfor -%}
+"
+consul_host_name: "{{ consul_node_index }}.consul.weave.local"
+consul_retry_join: "
+  {%- set join_peers = [] -%}
+  {%- for host in groups[consul_server_group] -%}
+    {%- if host != inventory_hostname and host not in join_peers -%}
+      {% do join_peers.append('%s.consul.weave.local' % loop.index) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ join_peers | join(' -retry-join ') }}
+"
+consul_start_args: "-server -retry-join {{ consul_retry_join }}"

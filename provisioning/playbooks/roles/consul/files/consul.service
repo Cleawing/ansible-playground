@@ -1,0 +1,15 @@
+[Unit]
+After=docker.service
+Description=Consul Agent
+Documentation=https://registry.hub.docker.com/u/progrium/consul/
+Requires=docker.service
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=5min
+EnvironmentFile=/etc/consul.env
+ExecStartPre=-/usr/bin/docker rm -f consul
+ExecStartPre=/usr/bin/docker pull cleawing/consul
+ExecStart=/usr/bin/docker run --name consul -h $CONSUL_HOST_NAME cleawing/consul $CONSUL_START_ARGS
+ExecStop=/usr/bin/docker stop consul
