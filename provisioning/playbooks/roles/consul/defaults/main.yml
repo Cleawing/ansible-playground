@@ -17,4 +17,4 @@ consul_retry_join: "
   {%- endfor -%}
   {{ join_peers | join(' -retry-join ') }}
 "
-consul_start_args: "-server -retry-join {{ consul_retry_join }}"
+consul_start_args: "-server -bootstrap-expect {{ groups[consul_server_group] | length }} -retry-join {{ consul_retry_join }}"
