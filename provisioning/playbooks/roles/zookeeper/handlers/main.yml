@@ -1,2 +1,7 @@
 ---
-# handlers file for zookeeper
+- name: Restart Zookeper Node
+  sudo: yes
+  service:
+    enabled: yes
+    name: zookeeper
+    state: restarted

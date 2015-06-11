@@ -1,4 +1,6 @@
 ---
+zookeeper_version: 3.4.6
+zookeeper_data: /mnt/zookeeper
 zookeeper_server_group: zookeeper_nodes
 zookeeper_node_index: "
     {%- for host in groups[zookeeper_server_group] -%}
