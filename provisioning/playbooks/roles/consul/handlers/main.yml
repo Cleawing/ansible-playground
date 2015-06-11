@@ -1,2 +1,7 @@
 ---
-# handlers file for consul
+- name: Restart Consul Agent
+  sudo: yes
+  service:
+    enabled: yes
+    name: consul
+    state: restarted

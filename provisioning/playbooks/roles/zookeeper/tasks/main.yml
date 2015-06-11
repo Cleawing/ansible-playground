@@ -24,6 +24,8 @@
     path: "{{ zookeeper_data }}"
     state: directory
     mode: 0755
+  notify:
+  - Restart Zookeper Node
   
 - name: Reload SystemD
   sudo: yes

@@ -6,6 +6,8 @@
     dest: "/etc/consul.env"
     mode: 0600
   register: consul_env
+  notify:
+  - Restart Consul Agent
 
 - name: Copy consul.service
   sudo: yes
@@ -13,16 +15,23 @@
     src: consul.service
     dest: /etc/systemd/system/consul.service
   register: consul_service
+  notify:
+  - Restart Consul Agent
+  
+- name: Ensure that data path exists
+  sudo: yes
+  file:
+    path: "{{ consul_data }}"
+    state: directory
+    mode: 0755
+  notify:
+  - Restart Consul Agent
   
 - name: Reload SystemD
   sudo: yes
   command: systemctl daemon-reload
   when: consul_service.changed
-
-- name: Restart Consul Agent
-  sudo: yes
-  service:
-    enabled: yes
-    name: consul
-    state: restarted
-  when: consul_service.changed or consul_env.changed
+  
+- name: Docker pull image
+  command: "/usr/bin/docker pull cleawing/consul:{{ consul_version }}"
+  when: consul_env.changed

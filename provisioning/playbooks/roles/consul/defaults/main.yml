@@ -1,4 +1,6 @@
 ---
+consul_version: 0.5.2
+consul_data: /mnt/data
 consul_server_group: consul_nodes
 consul_node_index: "
     {%- for host in groups[consul_server_group] -%}

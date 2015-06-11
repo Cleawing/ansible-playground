@@ -10,6 +10,5 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/consul.env
 ExecStartPre=-/usr/bin/docker rm -f consul
-ExecStartPre=/usr/bin/docker pull cleawing/consul
-ExecStart=/usr/bin/docker run --name consul -h $CONSUL_HOST_NAME cleawing/consul $CONSUL_START_ARGS
+ExecStart=/usr/bin/docker run --name consul -h $CONSUL_HOST_NAME -v ${CONSUL_DATA}:/data cleawing/consul:${CONSUL_VERSION} $CONSUL_START_ARGS
 ExecStop=/usr/bin/docker stop consul
