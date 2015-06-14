@@ -35,5 +35,3 @@
 - name: Docker pull image
   command: "/usr/bin/docker pull cleawing/zookeeper:{{ zookeeper_version }}"
   when: zookeeper_env.changed
-
-
