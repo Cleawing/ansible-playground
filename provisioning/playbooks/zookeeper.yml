@@ -1,4 +1,0 @@
-- name: Install and configure Zookeeper Cluster
-  hosts: coreos
-  roles:
-    - zookeeper

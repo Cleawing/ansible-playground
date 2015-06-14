@@ -1,4 +1,0 @@
-- name: Install and configure Consul
-  hosts: coreos
-  roles:
-    - consul

@@ -1,3 +1,3 @@
-[submodule "provisioning/playbooks/roles/coreos-bootstrap"]
-	path = provisioning/playbooks/roles/coreos-bootstrap
+[submodule "provisioning/roles/coreos-bootstrap"]
+	path = provisioning/roles/coreos-bootstrap
 	url = https://github.com/defunctzombie/ansible-coreos-bootstrap.git

@@ -1,5 +1,14 @@
-- include: playbooks/bootstrap_coreos.yml
-- include: playbooks/weave.yml
-- include: playbooks/consul.yml
-- include: playbooks/zookeeper.yml
-- include: playbooks/mesos-master.yml
+- hosts: coreos
+  gather_facts: False
+  roles:
+    - coreos-bootstrap
+
+- hosts: all
+  roles:
+    - weave
+
+- hosts: masters
+  roles:
+    - consul
+    - zookeeper
+    - mesos-master

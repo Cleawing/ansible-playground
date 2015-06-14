@@ -1,8 +1,9 @@
 # Size of the CoreOS cluster created by Vagrant
-$num_instances=3
+$master_num_instances=3
+$slave_num_instances=2
 
-# Used to fetch a new discovery token for a cluster of size $num_instances
-$new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
+# Used to fetch a new discovery token for a cluster of size $master_num_instances
+$new_discovery_url="https://discovery.etcd.io/new?size=#{$master_num_instances + $slave_num_instances}"
 
 # To automatically replace the discovery token on 'vagrant up', uncomment
 # the lines below:
@@ -49,7 +50,7 @@ $update_channel='beta'
 
 # Enable port forwarding of Docker TCP socket
 # Set to the TCP port you want exposed on the *host* machine, default is 2375
-# If 2375 is used, Vagrant will auto-increment (e.g. in the case of $num_instances > 1)
+# If 2375 is used, Vagrant will auto-increment (e.g. in the case of $master_num_instances > 1)
 # You can then use the docker tool locally by setting the following env var:
 #   export DOCKER_HOST='tcp://127.0.0.1:2375'
 #$expose_docker_tcp=2375
