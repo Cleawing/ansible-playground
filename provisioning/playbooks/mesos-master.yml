@@ -1,0 +1,4 @@
+- name: Install and configure Mesos Master
+  hosts: coreos
+  roles:
+    - mesos-master

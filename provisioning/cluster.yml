@@ -2,3 +2,4 @@
 - include: playbooks/weave.yml
 - include: playbooks/consul.yml
 - include: playbooks/zookeeper.yml
+- include: playbooks/mesos-master.yml

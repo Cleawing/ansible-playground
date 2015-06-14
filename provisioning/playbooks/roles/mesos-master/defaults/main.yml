@@ -1,0 +1,22 @@
+---
+mesos_version: 0.22.1
+mesos_work_dir: /mnt/mesos/data
+mesos_log_dir: /mnt/mesos/log
+mesos_master_group: mesos_masters
+zookeeper_server_group: zookeeper_nodes
+
+mesos_node_index: "
+    {%- for host in groups[mesos_master_group] -%}
+      {%- if host == 'default' or host == inventory_hostname or host == ansible_fqdn or host in ansible_all_ipv4_addresses -%}
+        {{ loop.index }}
+      {%- endif -%}
+    {%- endfor -%}
+"
+mesos_host_name: "{{ mesos_node_index }}.master.mesos.weave.local"
+mesos_zookeeper_nodes: "
+  {%- set zookeeper_peers = [] -%}
+  {%- for host in groups[zookeeper_server_group] -%}
+    {% do zookeeper_peers.append('%s.zookeeper.weave.local:2181' % loop.index) %}
+  {%- endfor -%}
+  {{ zookeeper_peers | join(',') }}"
+mesos_quorum: 1

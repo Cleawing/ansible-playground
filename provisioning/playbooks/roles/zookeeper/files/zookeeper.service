@@ -10,5 +10,5 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/zookeeper.env
 ExecStartPre=-/usr/bin/docker rm -f zookeeper
-ExecStart=/usr/bin/docker run --name zookeeper -h $ZOOKEEPER_HOST_NAME -v ${ZOOKEEPER_DATA}:/tmp/zookeeper $ZOOKEEPER_DOCKER_ARGS cleawing/zookeeper:${ZOOKEEPER_VERSION}
-ExecStop=/usr/bin/docker stop zookeeper
+ExecStart=/usr/bin/docker run --name zookeeper -h ${ZOOKEEPER_HOST_NAME} -v ${ZOOKEEPER_DATA}:/tmp/zookeeper $ZOOKEEPER_DOCKER_ARGS cleawing/zookeeper:${ZOOKEEPER_VERSION}
+ExecStop=-/usr/bin/docker stop zookeeper

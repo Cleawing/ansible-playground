@@ -1,0 +1,46 @@
+---
+- name: Upload /etc/mesos_master.env template
+  sudo: yes
+  template:
+    src: mesos_master.env.j2
+    dest: /etc/mesos_master.env
+    mode: 0600
+  register: mesos_master_env
+  notify:
+  - Restart Mesos Master
+  
+- name: Copy mesos-master.service
+  sudo: yes
+  copy:
+    src: mesos-master.service
+    dest: /etc/systemd/system/mesos-master.service
+  register: mesos_master_service
+  notify:
+  - Restart Mesos Master
+  
+- name: Ensure that work_dir exists
+  sudo: yes
+  file:
+    path: "{{ mesos_work_dir }}"
+    state: directory
+    mode: 0755
+  notify:
+  - Restart Mesos Master
+  
+- name: Ensure that log_dir exists
+  sudo: yes
+  file:
+    path: "{{ mesos_log_dir }}"
+    state: directory
+    mode: 0755
+  notify:
+  - Restart Mesos Master
+  
+- name: Reload SystemD
+  sudo: yes
+  command: systemctl daemon-reload
+  when: mesos_master_service.changed
+  
+- name: Docker pull image
+  command: "/usr/bin/docker pull cleawing/mesos:{{ mesos_version }}"
+  when: mesos_master_env.changed
