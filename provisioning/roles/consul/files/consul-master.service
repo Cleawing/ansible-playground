@@ -1,0 +1,14 @@
+[Unit]
+After=weave-proxy.service
+Description=Consul Master Node
+Documentation=https://registry.hub.docker.com/u/progrium/consul/
+Requires=weave-proxy.service
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=5min
+EnvironmentFile=/etc/consul_master.env
+ExecStartPre=-/usr/bin/docker rm -f consul-master
+ExecStart=/usr/bin/docker run --name consul-master -h $CONSUL_HOST_NAME -v ${CONSUL_DATA}:/data cleawing/consul:${CONSUL_VERSION} $CONSUL_MASTER_ARGS -retry-join $CONSUL_RETRY_JOIN
+ExecStop=-/usr/bin/docker stop consul-master

@@ -207,10 +207,12 @@ Vagrant.configure("2") do |config|
             "slaves" => (1..$slave_num_instances).map { |i| "%s-%02d" % [$slave_instance_name_prefix, i] },
             "coreos:children" => ["masters", "slaves"],
             "all_groups:children" => ["coreos"],
-            "weave_nodes:children" => ["masters", "slaves"],
-            "consul_nodes:children" => ["masters"],
             "zookeeper_nodes:children" => ["masters"],
-            "mesos_masters:children" => ["masters"]
+            "weave_nodes:children" => ["masters", "slaves"],
+            "consul_masters:children" => ["masters"],
+            "consul_slaves:children" => ["slaves"],
+            "mesos_masters:children" => ["masters"],
+            "mesos_slaves:children" => ["slaves"]
           }
           ansible.playbook = "provisioning/cluster.yml"
         end

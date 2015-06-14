@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Cleawing Inception <inception@cleawing.com>
-  description: Weave Network for Docker
+  description: Mesos Master Node
   company: Cleawing
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
@@ -118,13 +118,13 @@ galaxy_info:
   #- cloud:ec2
   #- cloud:gce
   #- cloud:rax
-  #- clustering
+  - clustering
   #- database
   #- database:nosql
   #- database:sql
   #- development
   #- monitoring
-  - networking
+  #- networking
   #- packaging
   #- system
   #- web

@@ -1,0 +1,17 @@
+---
+- name: Restart Network
+  sudo: yes
+  service:
+    name: systemd-networkd
+    state: restarted
+
+- name: Reload SystemD
+  sudo: yes
+  command: systemctl daemon-reload
+
+- name: Restart Docker
+  sudo: yes
+  service:
+    enabled: yes
+    name: docker
+    state: restarted

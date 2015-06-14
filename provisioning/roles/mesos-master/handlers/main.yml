@@ -1,7 +1,0 @@
----
-- name: Restart Mesos Master
-  sudo: yes
-  service:
-    enabled: yes
-    name: mesos-master
-    state: restarted

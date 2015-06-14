@@ -1,7 +1,16 @@
 ---
-- name: Restart Consul Agent
+- name: Restart Consul Master
   sudo: yes
   service:
     enabled: yes
-    name: consul
+    name: consul-master
     state: restarted
+  when: consul_master_mode
+
+- name: Restart Consul Slave
+  sudo: yes
+  service:
+    enabled: yes
+    name: consul-slave
+    state: restarted
+  when: not consul_master_mode

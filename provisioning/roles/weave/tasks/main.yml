@@ -4,14 +4,8 @@
   copy:
     src: 10-weave.network
     dest: /etc/systemd/network/10-weave.network
-  register: weave_network
-
-- name: Restart Network
-  sudo: yes
-  service:
-    name: systemd-networkd
-    state: restarted
-  when: weave_network.changed
+  notify:
+  - Restart Network
   
 - name: Copy weave-network.target
   sudo: yes
@@ -19,6 +13,8 @@
     src: weave-network.target
     dest: /etc/systemd/system/weave-network.target
   register: weave_network_target
+  notify:
+  - Reload SystemD
   
 - name: Assure /etc/systemd/system/docker.service.d exists
   sudo: yes
@@ -30,6 +26,9 @@
     src: 10-docker-adjust.conf
     dest: /etc/systemd/system/docker.service.d/10-docker-adjust.conf
   register: docker_adjust
+  notify:
+  - Reload SystemD
+  - Restart Docker
       
 - name: Copy install-weave.service
   sudo: yes
@@ -37,6 +36,8 @@
     src: install-weave.service
     dest: /etc/systemd/system/install-weave.service
   register: install_weave_service
+  notify:
+  - Reload SystemD
   
 - name: Copy weave.service
   sudo: yes
@@ -44,6 +45,8 @@
     src: weave.service
     dest: /etc/systemd/system/weave.service
   register: weave_service
+  notify:
+  - Reload SystemD
   
 - name: Copy weave-dns.service
   sudo: yes
@@ -51,6 +54,8 @@
     src: weave-dns.service
     dest: /etc/systemd/system/weave-dns.service
   register: weave_dns
+  notify:
+  - Reload SystemD
 
 - name: Copy weave-proxy.service
   sudo: yes
@@ -58,6 +63,8 @@
     src: weave-proxy.service
     dest: /etc/systemd/system/weave-proxy.service
   register: weave_proxy
+  notify:
+  - Reload SystemD
   
 - name: Upload /etc/weave.env template
   sudo: yes
@@ -67,29 +74,15 @@
     mode: 0600
   register: weave_env
   
-- name: Reload SystemD
-  sudo: yes
-  command: systemctl daemon-reload
-  when: weave_network_target.changed or docker_adjust.changed or install_weave_service.changed or weave_service.changed or weave_dns.changed or weave_proxy.changed
-  
-- name: Restart Docker
-  sudo: yes
-  service:
-    enabled: yes
-    name: docker
-    state: restarted
-  when: docker_adjust.changed
-  notify:
-  - Waiting for Weave Router
-  - Waiting for Weave Proxy
+- meta: flush_handlers
   
 - name: Install Weave
   sudo: yes
   service:
     enabled: yes
     name: install-weave
-    state: started
-  when: install_weave_service | changed
+    state: restarted
+  when: install_weave_service.changed
           
 - name: Restart Weave Router
   sudo: yes

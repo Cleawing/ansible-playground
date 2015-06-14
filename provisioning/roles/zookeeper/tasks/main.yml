@@ -1,4 +1,14 @@
 ---
+- name: Copy zookeeper.service
+  sudo: yes
+  copy:
+    src: zookeeper.service
+    dest: /etc/systemd/system/zookeeper.service
+  register: zookeeper_service
+  notify:
+  - Reload SystemD
+  - Restart Zookeper Node
+  
 - name: Upload /etc/zookeeper.env template
   sudo: yes
   template:
@@ -6,15 +16,6 @@
     dest: /etc/zookeeper.env
     mode: 0600
   register: zookeeper_env
-  notify:
-  - Restart Zookeper Node
-  
-- name: Copy zookeeper.service
-  sudo: yes
-  copy:
-    src: zookeeper.service
-    dest: /etc/systemd/system/zookeeper.service
-  register: zookeeper_service
   notify:
   - Restart Zookeper Node
   
@@ -27,11 +28,5 @@
   notify:
   - Restart Zookeper Node
   
-- name: Reload SystemD
-  sudo: yes
-  command: systemctl daemon-reload
-  when: zookeeper_service.changed
-  
 - name: Docker pull image
   command: "/usr/bin/docker pull cleawing/zookeeper:{{ zookeeper_version }}"
-  when: zookeeper_env.changed

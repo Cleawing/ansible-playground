@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Cleawing Inception <inception@cleawing.com>
-  description: Mesos Master Node
+  description: Common Handlers
   company: Cleawing
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
@@ -13,7 +13,7 @@ galaxy_info:
   # - GPLv3
   # - Apache
   # - CC-BY
-  license: Apache
+  license: license (GPLv2, CC-BY, etc)
   min_ansible_version: 1.2
   #
   # Below are all platforms currently available. Just uncomment
@@ -113,12 +113,12 @@ galaxy_info:
   # Below are all categories currently available. Just as with
   # the platforms above, uncomment those that apply to your role.
   #
-  categories:
-  - cloud
+  #categories:
+  #- cloud
   #- cloud:ec2
   #- cloud:gce
   #- cloud:rax
-  - clustering
+  #- clustering
   #- database
   #- database:nosql
   #- database:sql

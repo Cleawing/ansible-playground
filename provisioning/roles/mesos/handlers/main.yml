@@ -1,0 +1,16 @@
+---
+- name: Restart Mesos Master
+  sudo: yes
+  service:
+    enabled: yes
+    name: mesos-master
+    state: restarted
+  when: mesos_master_mode 
+
+- name: Restart Mesos Slave
+  sudo: yes
+  service:
+    enabled: yes
+    name: mesos-slave
+    state: restarted
+  when: not mesos_master_mode

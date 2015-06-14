@@ -1,23 +1,46 @@
 ---
-- name: Upload /etc/consul.env template
-  sudo: yes
-  template:
-    src: consul.env.j2
-    dest: "/etc/consul.env"
-    mode: 0600
-  register: consul_env
-  notify:
-  - Restart Consul Agent
-
-- name: Copy consul.service
+- name: Copy consul-master.service
   sudo: yes
   copy:
-    src: consul.service
-    dest: /etc/systemd/system/consul.service
-  register: consul_service
+    src: consul-master.service
+    dest: /etc/systemd/system/consul-master.service
+  when: consul_master_mode
   notify:
-  - Restart Consul Agent
+  - Reload SystemD
+  - Restart Consul Master
   
+- name: Copy consul-slave.service
+  sudo: yes
+  copy:
+    src: consul-slave.service
+    dest: /etc/systemd/system/consul-slave.service
+  when: not consul_master_mode
+  notify:
+  - Reload SystemD
+  - Restart Consul Slave
+  
+- name: Upload /etc/consul_master.env template
+  sudo: yes
+  template:
+    src: consul_master.env.j2
+    dest: "/etc/consul_master.env"
+    mode: 0600
+  register: consul_master_env
+  when: consul_master_mode 
+  notify:
+  - Restart Consul Master
+  
+- name: Upload /etc/consul_slave.env template
+  sudo: yes
+  template:
+    src: consul_slave.env.j2
+    dest: "/etc/consul_slave.env"
+    mode: 0600
+  register: consul_slave_env
+  when: not consul_master_mode 
+  notify:
+  - Restart Consul Slave
+
 - name: Ensure that data path exists
   sudo: yes
   file:
@@ -25,13 +48,8 @@
     state: directory
     mode: 0755
   notify:
-  - Restart Consul Agent
-  
-- name: Reload SystemD
-  sudo: yes
-  command: systemctl daemon-reload
-  when: consul_service.changed
+  - Restart Consul Master
+  - Restart Consul Slave
   
 - name: Docker pull image
   command: "/usr/bin/docker pull cleawing/consul:{{ consul_version }}"
-  when: consul_env.changed

@@ -1,0 +1,15 @@
+[Unit]
+After=weave-proxy.service
+Description=Mesos Slave Node
+Documentation=https://github.com/sekka1/mesosphere-docker
+Requires=weave-proxy.service
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=5min
+EnvironmentFile=/etc/mesos_slave.env
+ExecStartPre=-/usr/bin/docker kill mesos-slave
+ExecStartPre=-/usr/bin/docker rm -f mesos-slave
+ExecStart=/usr/bin/docker run --name mesos-slave --privileged -h ${MESOS_HOSTNAME} -v ${MESOS_LOG_DIR}:/var/log/mesos -v ${MESOS_WORK_DIR}:/tmp/mesos -v /sys:/sys -v /usr/bin/docker:/usr/bin/docker:ro -v /var/run/docker.sock:/var/run/docker.sock -v /lib64/libdevmapper.so.1.02:/lib/libdevmapper.so.1.02:ro -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e MESOS_CONTAINERIZERS=docker -e MESOS_MASTER=zk://${ZOOKEEPER_NODES}/mesos cleawing/mesos /opt/run-slave.sh
+ExecStop=-/usr/bin/docker stop mesos-slave
