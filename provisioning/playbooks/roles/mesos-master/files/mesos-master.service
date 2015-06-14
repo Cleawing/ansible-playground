@@ -10,5 +10,5 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/mesos_master.env
 ExecStartPre=-/usr/bin/docker rm -f mesos
-ExecStart=/usr/bin/docker run --name mesos -h ${MESOS_HOSTNAME} -v ${MESOS_WORK_DIR}:/var/lib/mesos -v ${MESOS_LOG_DIR}:/var/log/mesos -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e MESOS_ZK=zk://${ZOOKEEPER_NODES}/mesos -e MESOS_QUORUM=${MESOS_QUORUM}  cleawing/mesos:${MESOS_VERSION} /opt/run-master.sh
+ExecStart=/usr/bin/docker run --name mesos -h ${MESOS_HOSTNAME} -v ${MESOS_WORK_DIR}:/var/lib/mesos -v ${MESOS_LOG_DIR}:/var/log/mesos -e MESOS_CLUSTER=${MESOS_CLUSTER_NAME} -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e MESOS_ZK=zk://${ZOOKEEPER_NODES}/mesos -e MESOS_QUORUM=${MESOS_QUORUM}  cleawing/mesos:${MESOS_VERSION} /opt/run-master.sh
 ExecStop=-/usr/bin/docker stop mesos

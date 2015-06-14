@@ -1,5 +1,6 @@
 ---
 mesos_version: 0.22.1
+mesos_cluster_name: mesos
 mesos_work_dir: /mnt/mesos/data
 mesos_log_dir: /mnt/mesos/log
 mesos_master_group: mesos_masters
