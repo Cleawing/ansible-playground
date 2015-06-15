@@ -1,0 +1,51 @@
+---
+- name: Check that Docker installed and extract Server version
+  shell: "docker version | grep -Po '(?<=Server version: )\\d.\\d.\\d'"
+  ignore_errors: True
+  register: docker_installed
+  
+- name: Get uname
+  command: uname -r
+  register: os_uname
+  when: docker_installed | failed or docker_installed.stdout != docker_version
+
+- name: Add apt-key
+  apt_key:
+    keyserver: p80.pool.sks-keyservers.net
+    id: 36A1D7869245C8950F966E92D8576A8BA88D21E9
+  when: docker_installed | failed or docker_installed.stdout != docker_version
+  
+- name: Add Docker repo
+  apt_repository:
+    repo: deb http://get.docker.io/ubuntu docker main
+    state: present
+  when: docker_installed | failed or docker_installed.stdout != docker_version
+    
+- name: Install os packages
+  apt:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+  with_items: 
+    - linux-image-extra-{{os_uname.stdout}}
+    - lxc-docker={{docker_version}}
+  when: docker_installed | failed or docker_installed.stdout != docker_version
+  notify:
+  - Restart Docker
+  
+- name: Adjust /etc/default/docker
+  lineinfile:
+    dest: /etc/default/docker
+    regexp: ^#DOCKER_OPTS
+    line: 'DOCKER_OPTS="--dns 8.8.8.8 --dns 8.8.4.4 -s overlay"'
+  notify:
+  - Restart Docker
+    
+- name: Copy docker.service
+  sudo: yes
+  copy:
+    src: docker.service
+    dest: /etc/systemd/system/docker.service
+  notify:
+  - Reload SystemD
+  - Restart Docker
