@@ -1,14 +1,4 @@
 ---
-# defaults file for weave
-weave_group: weave_nodes
-weave_node_index: "
-    {%- for host in groups[weave_group] -%}
-      {%- if host == 'default' or host == inventory_hostname or host == ansible_fqdn or host in ansible_all_ipv4_addresses -%}
-        {{ loop.index }}
-      {%- endif -%}
-    {%- endfor -%}
-"
-weave_bridge_ip: "10.2.0.{{ weave_node_index }}/16"
 weave_docker_subnet: "10.2.{{ weave_node_index }}.0/24"
 
 weave_launch_peers: "

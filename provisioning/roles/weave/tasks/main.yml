@@ -71,13 +71,12 @@
   - Restart Docker
   
 - meta: flush_handlers
-          
+      
 - name: Restart Weave Router
   service:
     enabled: yes
     name: weave
     state: restarted
-  when: install_weave_service.changed or weave_service.changed or weave_env.changed or weave_iface.changed
+  when: install_weave_service.changed or weave_service.changed or weave_env.changed
   notify:
   - Waiting for Weave Router
-  
