@@ -33,14 +33,6 @@
   notify:
   - Restart Docker
   
-- name: Adjust /etc/default/docker
-  lineinfile:
-    dest: /etc/default/docker
-    regexp: ^#DOCKER_OPTS
-    line: 'DOCKER_OPTS="--dns 8.8.8.8 --dns 8.8.4.4 -s overlay"'
-  notify:
-  - Restart Docker
-    
 - name: Copy docker.service
   sudo: yes
   copy:
@@ -49,3 +41,12 @@
   notify:
   - Reload SystemD
   - Restart Docker
+  
+- name: Adjust /etc/default/docker
+  lineinfile:
+    dest: /etc/default/docker
+    line: 'DOCKER_STORAGE="-s overlay"'
+  notify:
+  - Restart Docker
+  
+- meta: flush_handlers

@@ -1,6 +1,5 @@
 ---
 - name: Copy 10-weave.network
-  sudo: yes
   copy:
     src: 10-weave.network
     dest: /etc/systemd/network/10-weave.network
@@ -8,30 +7,14 @@
   - Restart Network
   
 - name: Copy weave-network.target
-  sudo: yes
   copy:
     src: weave-network.target
     dest: /etc/systemd/system/weave-network.target
   register: weave_network_target
   notify:
   - Reload SystemD
-  
-- name: Assure /etc/systemd/system/docker.service.d exists
-  sudo: yes
-  file: path=/etc/systemd/system/docker.service.d state=directory
-      
-- name: Adjust Docker
-  sudo: yes
-  copy:
-    src: 10-docker-adjust.conf
-    dest: /etc/systemd/system/docker.service.d/10-docker-adjust.conf
-  register: docker_adjust
-  notify:
-  - Reload SystemD
-  - Restart Docker
-      
+        
 - name: Copy install-weave.service
-  sudo: yes
   copy:
     src: install-weave.service
     dest: /etc/systemd/system/install-weave.service
@@ -40,34 +23,14 @@
   - Reload SystemD
   
 - name: Copy weave.service
-  sudo: yes
   copy:
     src: weave.service
     dest: /etc/systemd/system/weave.service
   register: weave_service
   notify:
   - Reload SystemD
-  
-- name: Copy weave-dns.service
-  sudo: yes
-  copy:
-    src: weave-dns.service
-    dest: /etc/systemd/system/weave-dns.service
-  register: weave_dns
-  notify:
-  - Reload SystemD
-
-- name: Copy weave-proxy.service
-  sudo: yes
-  copy:
-    src: weave-proxy.service
-    dest: /etc/systemd/system/weave-proxy.service
-  register: weave_proxy
-  notify:
-  - Reload SystemD
-  
+    
 - name: Upload /etc/weave.env template
-  sudo: yes
   template:
     src: weave.env.j2
     dest: "/etc/weave.env"
@@ -75,17 +38,41 @@
   register: weave_env
   
 - meta: flush_handlers
-  
+
+- name: Pull Docker Images
+  command: docker pull {{ item }}
+  with_items:
+    - weaveworks/weave:latest
+    - weaveworks/weavedns:latest
+    - weaveworks/weaveexec:latest
+  when: install_weave_service.changed
+  register: weave_pulled
+  until: weave_pulled.changed
+    
 - name: Install Weave
-  sudo: yes
   service:
     enabled: yes
     name: install-weave
     state: restarted
-  when: install_weave_service.changed
+  when: install_weave_service.changed and weave_pulled.changed
+  register: weave_installed
+  
+- name: Assign IP to weave bridge
+  command: "ip addr add dev weave {{ weave_bridge_ip }}"
+  when: weave_installed.changed
+  ignore_errors: True
+  
+- name: Adjust /etc/default/docker
+  lineinfile:
+    dest: /etc/default/docker
+    line: 'DOCKER_NETWORK="{{ weave_docker_opts }}"'
+  when: weave_installed.changed
+  notify:
+  - Restart Docker
+  
+- meta: flush_handlers
           
 - name: Restart Weave Router
-  sudo: yes
   service:
     enabled: yes
     name: weave
@@ -93,25 +80,4 @@
   when: install_weave_service.changed or weave_service.changed or weave_env.changed
   notify:
   - Waiting for Weave Router
-
-# TODO. wait_for for UDP ports (and wait for Weave DNS)
-- name: Restart Weave DNS
-  sudo: yes
-  service:
-    enabled: yes
-    name: weave-dns
-    state: restarted
-  when: install_weave_service.changed or weave_service.changed or weave_env.changed or weave_dns.changed
-  ignore_errors: True
-
-- name: Restart Weave Proxy
-  sudo: yes
-  service:
-    enabled: yes
-    name: weave-proxy
-    state: restarted
-  when: install_weave_service.changed or weave_service.changed or weave_env.changed or weave_proxy.changed
-  ignore_errors: True
-  notify:
-  - Waiting for Weave Proxy
   

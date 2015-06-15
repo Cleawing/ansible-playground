@@ -11,11 +11,11 @@ Restart=always
 RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/weave.env
-ExecStartPre=-/opt/bin/weave stop
-ExecStartPre=/opt/bin/weave launch -iprange $WEAVE_IP_RANGE $WEAVE_PEERS
+ExecStartPre=-/usr/bin/weave stop
+ExecStartPre=/usr/bin/weave launch $WEAVE_PEERS
 ExecStart=/usr/bin/docker logs -f weave
 SuccessExitStatus=2
-ExecStop=/opt/bin/weave stop
+ExecStop=/usr/bin/weave stop
 
 [Install]
 WantedBy=weave-network.target

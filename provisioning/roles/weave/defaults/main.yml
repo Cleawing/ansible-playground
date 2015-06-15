@@ -1,29 +1,21 @@
 ---
 # defaults file for weave
 weave_bridge_ip: "10.2.0.1/16"
-weave_server_group: weave_nodes
+weave_group: weave_nodes
 weave_docker_subnet: "
-    {%- for host in groups[weave_server_group] -%}
+    {%- for host in groups[weave_group] -%}
       {%- if host == 'default' or host == inventory_hostname or host == ansible_fqdn or host in ansible_all_ipv4_addresses -%}
         10.2.{{ loop.index }}.0/24
       {%- endif -%}
-    {%- endfor -%}
-"
-weave_dns_cidr: "
-    {%- for host in groups[weave_server_group] -%}
-      {%- if host == 'default' or host == inventory_hostname or host == ansible_fqdn or host in ansible_all_ipv4_addresses -%}
-        10.2.254.{{ loop.index }}/24
-      {%- endif -%}
-    {%- endfor -%}
-"
+    {%- endfor -%}"
+
 weave_launch_peers: "
   {%- set weave_peers = [] -%}
-  {%- for host in groups[weave_server_group] -%}
+  {%- for host in groups[weave_group] -%}
     {%- if host != inventory_hostname and host not in weave_peers -%}
       {% do weave_peers.append(hostvars[host]['ansible_eth1']['ipv4']['address']) %}
     {%- endif -%}
   {%- endfor -%}
-  {{ weave_peers|join(' ') }}
-"
+  {{ weave_peers|join(' ') }}"
 
-weave_docker_opts: "--bridge=weave --fixed-cidr={{ weave_docker_subnet }} --icc=false -r=false"
+weave_docker_opts: "--bridge=weave --fixed-cidr={{ weave_docker_subnet }} --icc=false"

@@ -1,0 +1,6 @@
+---
+- name: Disable RPCBind
+  service:
+    enabled: no
+    name: rpcbind
+    state: stopped

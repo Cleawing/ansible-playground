@@ -4,7 +4,3 @@
     port: 6783
     timeout: 60
     
-- name: Waiting for Weave Proxy
-  wait_for:
-    port: 12375
-    timeout: 60
