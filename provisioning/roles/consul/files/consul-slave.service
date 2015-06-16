@@ -1,8 +1,8 @@
 [Unit]
-After=weave-proxy.service
+After=weave.service
 Description=Consul Slave Node
 Documentation=https://registry.hub.docker.com/u/progrium/consul/
-Requires=weave-proxy.service
+Requires=weave.service
 
 [Service]
 Restart=always
@@ -10,5 +10,5 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/consul_slave.env
 ExecStartPre=-/usr/bin/docker rm -f consul-slave
-ExecStart=/usr/bin/docker run --name consul-slave -h $CONSUL_HOST_NAME -v ${CONSUL_DATA}:/data cleawing/consul:${CONSUL_VERSION} -retry-join $CONSUL_RETRY_JOIN
+ExecStart=/usr/bin/docker run --name consul-slave -h $CONSUL_HOST_NAME -p ${BRIDGE_IP}:8300:8300 -p ${BRIDGE_IP}:8301:8301 -p ${BRIDGE_IP}:8301:8301/udp -p ${BRIDGE_IP}:8302:8302 -p ${BRIDGE_IP}:8302:8302/udp -p ${BRIDGE_IP}:8400:8400 -p ${BRIDGE_IP}:8500:8500 -p ${BRIDGE_IP}:53:53 -p ${BRIDGE_IP}:53:53/udp cleawing/consul:${CONSUL_VERSION} -advertise $BRIDGE_IP -retry-join $CONSUL_RETRY_JOIN
 ExecStop=-/usr/bin/docker stop consul-slave

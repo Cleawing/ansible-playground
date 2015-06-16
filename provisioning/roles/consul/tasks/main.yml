@@ -5,6 +5,7 @@
     src: consul-master.service
     dest: /etc/systemd/system/consul-master.service
   when: consul_master_mode
+  register: consul_master_service
   notify:
   - Reload SystemD
   - Restart Consul Master
@@ -15,6 +16,7 @@
     src: consul-slave.service
     dest: /etc/systemd/system/consul-slave.service
   when: not consul_master_mode
+  register: consul_slave_service
   notify:
   - Reload SystemD
   - Restart Consul Slave
@@ -53,3 +55,6 @@
   
 - name: Docker pull image
   command: "/usr/bin/docker pull cleawing/consul:{{ consul_version }}"
+  when: consul_master_env.changed or consul_slave_env.changed or consul_master_service.changed or consul_slave_service.changed
+  register: consul_image_pulled
+  until: consul_image_pulled.changed

@@ -9,12 +9,14 @@ zookeeper_node_index: "
       {%- endif -%}
     {%- endfor -%}
 "
-zookeeper_host_name: "{{ zookeeper_node_index }}.zookeeper.weave.local"
+zookeeper_host_name: "{{ zookeeper_node_index }}.zookeeper"
+zookeeper_bridge_ip: "{{ weave_bridge_ip | replace('/16', '') }}"
+
 zookeeper_nodes_env: "
   {%- set zookeeper_peers = [] -%}
-  {%- for host in groups[zookeeper_server_group] -%}
-    {%- if host != inventory_hostname and host not in zookeeper_peers -%}
-      {% do zookeeper_peers.append('ADDITIONAL_ZOOKEEPER_%s=server.%s=%s.zookeeper.weave.local:2888:3888' % (loop.index, loop.index, loop.index,)) %}
+  {%- for host in groups[weave_group] -%}
+    {%- if host != inventory_hostname and host in groups[zookeeper_server_group] -%}
+      {% do zookeeper_peers.append('ADDITIONAL_ZOOKEEPER_%s=server.%s=10.2.0.%s:2888:3888' % (loop.index, loop.index, loop.index)) %}
     {%- endif -%}
   {%- endfor -%}
   {{ zookeeper_peers | join(' -e ') }}"
