@@ -1,0 +1,85 @@
+---
+- name: Check that OpenVSwitch installed and extract version
+  shell: "ovs-vsctl -V"
+  ignore_errors: True
+  register: ovs_installed
+  
+- name: Install packages
+  apt:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+  with_items:
+    - bridge-utils 
+    - openvswitch-switch
+    - openvswitch-ipsec
+    - openvswitch-vtep
+    - openvswitch-pki
+  when: ovs_installed | failed
+  register: ovs_pkg_installed
+  until: ovs_pkg_installed.changed
+  
+- name: Enable Racoon service
+  service:
+    enabled: yes
+    name: racoon
+    state: started
+    
+- name: Upload /etc/network/interfaces.d/ovs-network.cfg template
+  template:
+    src: ovs-network.cfg.j2
+    dest: /etc/network/interfaces.d/ovs-network.cfg
+    
+- name: Restart Networking
+  service:
+    name: networking
+    state: restarted 
+
+#- name: Create OVS bridge
+#  openvswitch_bridge:
+#    bridge: br0
+#    state: present
+#  register: ovs_bridge_created
+  
+#- name: Enable STP for OVS bridge
+#  command: "ovs-vsctl set bridge br0 stp_enable=true"
+#  when: ovs_bridge_created.changed
+  
+#- name: Create OVS internal port
+#  command: "ovs-vsctl add-port br0 internal-ovs -- set interface internal-ovs type=internal"
+#  when: ovs_bridge_created.changed
+  
+#- name: Create OVS docker port
+#  command: "ovs-vsctl add-port br0 docker-ovs -- set interface docker-ovs type=internal"
+#  when: ovs_bridge_created.changed
+      
+#- name: Upload /etc/systemd/network/10-internal-bridge.network template
+#  template:
+#    src: 10-internal-bridge.network.j2
+#    dest: /etc/systemd/network/10-internal-bridge.network
+#  register: internal_bridge_network
+#  when: ovs_bridge_created.changed
+#  notify:
+#  - Restart Network
+  
+#- name: Upload /etc/systemd/network/20-docker-bridge.network template
+#  template:
+#    src: 20-docker-bridge.network.j2
+#    dest: /etc/systemd/network/20-docker-bridge.network
+#  register: docker_bridge_network
+#  when: ovs_bridge_created.changed
+#  notify:
+#  - Restart Network
+  
+# - meta: flush_handlers
+   
+#- name: Setup IPSec GRE tunnels for internal bridges
+#  command: "ovs-vsctl add-port internal-ovs internal-gre{{  item.0 }} -- set interface internal-gre{{  item.0 }} type=ipsec_gre options:remote_ip={{ item.1 }} options:psk={{ ovs_psk }}"
+#  with_indexed_items: "{{ internal_bridge_peers.split(' ') }}"
+#  when: internal_bridge_network.changed
+  
+#- name: Setup IPSec GRE tunnels
+#  command: "ovs-vsctl add-port br0 gre{{  item.0 }} -- set interface gre{{  item.0 }} type=ipsec_gre options:remote_ip={{ item.1 }} options:psk={{ ovs_psk }}"
+#  with_indexed_items: "{{ docker_bridge_peers.split(' ') }}"
+#  when: docker_bridge_network.changed
+    

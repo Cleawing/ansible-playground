@@ -34,8 +34,8 @@
     - linux-image-extra-{{os_uname.stdout}}
     - lxc-docker={{docker_version}}
   when: docker_installed | failed or docker_installed.stdout != docker_version
-  register: pkg_installed
-  until: pkg_installed.changed
+  register: docker_pkg_installed
+  until: docker_pkg_installed.changed
   notify:
   - Restart Docker
   
@@ -48,10 +48,17 @@
   - Reload SystemD
   - Restart Docker
   
-- name: Adjust /etc/default/docker
+- name: Adjust DOCKER_STORAGE
   lineinfile:
     dest: /etc/default/docker
     line: 'DOCKER_STORAGE="-s overlay"'
+  notify:
+  - Restart Docker
+
+- name: Adjust DOCKER_NETWORK
+  lineinfile:
+    dest: /etc/default/docker
+    line: "DOCKER_NETWORK=' --bridge=docker-ovs --fixed-cidr={{ docker_subnet }} --icc=false'"
   notify:
   - Restart Docker
   

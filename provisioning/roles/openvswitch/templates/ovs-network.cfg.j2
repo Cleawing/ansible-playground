@@ -1,0 +1,44 @@
+
+{%- set internal_peers = docker_bridge_peers.split(' ') -%}
+auto br0=br0
+allow-ovs br0
+iface br0 inet manual
+    ovs_type OVSBridge
+    ovs_ports {% for host in internal_peers %}gre{{ loop.index }} {% endfor %}
+
+    ovs_extra set bridge ${IFACE} stp_enable=true
+    mtu 1462
+
+{% for host in internal_peers %}
+allow-br0 gre{{ loop.index }}
+iface gre{{ loop.index }} inet manual
+    ovs_type OVSPort
+    ovs_bridge br0
+    ovs_extra set interface ${IFACE} type=ipsec_gre options:remote_ip={{ host }} options:psk={{ ovs_psk }}
+{% endfor %}
+
+auto internal-ovs=internal-ovs
+allow-br0 internal-ovs
+iface internal-ovs inet manual
+    ovs_type OVSIntPort
+    ovs_bridge br0
+
+auto docker-ovs=docker-ovs
+allow-br0 docker-ovs
+iface docker-ovs inet manual
+    ovs_type OVSIntPort
+    ovs_bridge br0
+        
+auto docker-ovs=docker-ovs
+iface docker-ovs inet static
+    address {{ docker_bridge_ip }}
+    network {{ docker_network }}
+    netmask 255.255.0.0
+    mtu 1462
+
+auto internal-ovs=internal-ovs
+iface internal-ovs inet static
+    address {{ internal_bridge_ip }}
+    network {{ internal_network }}
+    netmask 255.255.255.0
+    mtu 1462

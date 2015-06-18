@@ -1,8 +1,8 @@
 [Unit]
-After=weave-proxy.service
+After=openvswitch-switch.service
 Description=Mesos Master Node
 Documentation=https://github.com/sekka1/mesosphere-docker
-Requires=weave-proxy.service
+After=openvswitch-switch.service
 
 [Service]
 Restart=always
@@ -10,5 +10,5 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/mesos_master.env
 ExecStartPre=-/usr/bin/docker rm -f mesos-master
-ExecStart=/usr/bin/docker run --name mesos-master -h ${MESOS_HOSTNAME} -v ${MESOS_WORK_DIR}:/var/lib/mesos -v ${MESOS_LOG_DIR}:/var/log/mesos -e MESOS_CLUSTER=${MESOS_CLUSTER_NAME} -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e MESOS_ZK=zk://${ZOOKEEPER_NODES}/mesos -e MESOS_QUORUM=${MESOS_QUORUM}  cleawing/mesos:${MESOS_VERSION} /opt/run-master.sh
+ExecStart=/usr/bin/docker run --name mesos-master -h ${MESOS_HOSTNAME} --net="host" -p ${BRIDGE_IP}:5050:5050 -v ${MESOS_WORK_DIR}:/var/lib/mesos -v ${MESOS_LOG_DIR}:/var/log/mesos -e MESOS_CLUSTER=${MESOS_CLUSTER_NAME} -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e MESOS_IP=${BRIDGE_IP} -e MESOS_ZK=zk://${ZOOKEEPER_NODES}/mesos -e MESOS_QUORUM=${MESOS_QUORUM} cleawing/mesos:${MESOS_VERSION} /opt/run-master.sh
 ExecStop=-/usr/bin/docker stop mesos-master

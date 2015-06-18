@@ -8,6 +8,7 @@ weave_node_index: "
 "
 weave_bridge_ip: "10.2.0.{{ weave_node_index }}/16"
 
+
 master_join_peers: "
     {%- set join_peers = [] -%}
     {%- for host in groups[weave_group] -%}
@@ -16,3 +17,30 @@ master_join_peers: "
       {%- endif -%}
     {%- endfor -%}
     {{ join_peers | join(',') }}"
+    
+internal_bridge_psk: "{{ lookup('password', '../../../credentials/internal_bridge_password') | hash('sha512') }}"
+docker_bridge_psk: "{{ lookup('password', '../../../credentials/docker_bridge_password') | hash('sha512') }}"
+ovs_psk: "{{ lookup('password', '../../../credentials/ovs_psk_password') | hash('sha512') }}"
+internal_bridge_ip: "10.3.0.{{ weave_node_index }}"
+internal_network: "10.3.0.0"
+docker_bridge_ip: "10.2.{{ weave_node_index }}.1"
+docker_network: "10.2.0.0"
+docker_subnet: "10.2.{{ weave_node_index }}.0/24"
+
+internal_bridge_peers: "
+  {%- set internal_peers = [] -%}
+  {%- for host in groups[weave_group] -%}
+    {%- if host != inventory_hostname and host not in internal_peers -%}
+      {% do internal_peers.append(hostvars[host]['ansible_eth1']['ipv4']['address']) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ internal_peers|join(' ') }}"
+  
+docker_bridge_peers: "
+  {%- set internal_peers = [] -%}
+  {%- for host in groups[weave_group] -%}
+    {%- if host != inventory_hostname and host not in internal_peers -%}
+      {% do internal_peers.append(hostvars[host]['ansible_eth1']['ipv4']['address']) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ internal_peers|join(' ') }}"

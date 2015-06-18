@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Cleawing Inception <inception@cleawing.com>
-  description: Install and Configure Mesos Master Node
+  description: Install and Configure OpenVSwitch
   company: Cleawing
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
@@ -124,7 +124,7 @@ galaxy_info:
   #- database:sql
   #- development
   #- monitoring
-  #- networking
+  - networking
   #- packaging
   #- system
   #- web

@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-$master_num_instances=3
+$master_num_instances=1
 $slave_num_instances=1
 $master_instance_name_prefix = "master"
 $slave_instance_name_prefix = "slave"
@@ -21,6 +21,7 @@ Vagrant.configure(2) do |config|
         vb.gui = $vm_gui
         vb.memory = $vm_memory
         vb.cpus = $vm_cpus
+        vb.customize ['modifyvm', :id, '--nicpromisc1', 'allow-all']
       end
 
       ip = "172.17.8.#{i+100}"
@@ -36,6 +37,7 @@ Vagrant.configure(2) do |config|
         vb.gui = $vm_gui
         vb.memory = $vm_memory
         vb.cpus = $vm_cpus
+        vb.customize ['modifyvm', :id, '--nicpromisc1', 'allow-all']
       end
 
       ip = "172.17.8.#{i+$master_num_instances+100}"

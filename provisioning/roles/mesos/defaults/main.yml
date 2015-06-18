@@ -20,13 +20,16 @@ mesos_slave_node_index: "
       {%- endif -%}
     {%- endfor -%}"
        
-mesos_master_host_name: "{{ mesos_master_node_index }}.master.mesos.weave.local"
-mesos_slave_host_name: "{{ mesos_slave_node_index }}.slave.mesos.weave.local"
+mesos_master_host_name: "{{ mesos_master_node_index }}.master.mesos"
+mesos_slave_host_name: "{{ mesos_slave_node_index }}.slave.mesos"
 
 mesos_zookeeper_nodes: "
   {%- set zookeeper_peers = [] -%}
-  {%- for host in groups[zookeeper_server_group] -%}
-    {% do zookeeper_peers.append('%s.zookeeper.weave.local:2181' % loop.index) %}
+  {%- for host in groups[weave_group] -%}
+    {%- if host not in groups['slaves'] -%}
+      {% do zookeeper_peers.append('10.2.0.%s:2181' % loop.index) %}
+    {%- endif -%}
   {%- endfor -%}
   {{ zookeeper_peers | join(',') }}"
 mesos_quorum: 1
+mesos_bridge_ip: "{{ weave_bridge_ip | replace('/16', '') }}"

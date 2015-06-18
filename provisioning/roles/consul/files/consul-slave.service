@@ -1,8 +1,8 @@
 [Unit]
-After=weave.service
+After=openvswitch-switch.service
 Description=Consul Slave Node
 Documentation=https://registry.hub.docker.com/u/progrium/consul/
-Requires=weave.service
+Requires=openvswitch-switch.service
 
 [Service]
 Restart=always

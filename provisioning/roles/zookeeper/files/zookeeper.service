@@ -1,8 +1,8 @@
 [Unit]
-After=weave.service
+After=openvswitch-switch.service
 Description=Zookeeper Node
 Documentation=https://github.com/sekka1/mesosphere-docker
-Requires=weave.service
+After=openvswitch-switch.service
 
 [Service]
 Restart=always
