@@ -5,7 +5,6 @@ allow-ovs br0
 iface br0 inet manual
     ovs_type OVSBridge
     ovs_ports {% for host in internal_peers %}gre{{ loop.index }} {% endfor %}
-
     ovs_extra set bridge ${IFACE} stp_enable=true
     mtu 1462
 
@@ -17,8 +16,8 @@ iface gre{{ loop.index }} inet manual
     ovs_extra set interface ${IFACE} type=ipsec_gre options:remote_ip={{ host }} options:psk={{ ovs_psk }}
 {% endfor %}
 
-auto docker-ovs=docker-ovs
-iface docker-ovs inet static
+auto docker0=docker0
+iface docker0 inet static
     address {{ docker_bridge_ip }}
     network {{ docker_network }}
     netmask 255.255.0.0
@@ -29,6 +28,7 @@ auto internal-ovs=internal-ovs
 allow-br0 internal-ovs
 iface internal-ovs inet manual
     ovs_type OVSIntPort
+    ovs_options tag=200
     ovs_bridge br0
     
 auto internal-ovs=internal-ovs

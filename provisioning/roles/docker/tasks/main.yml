@@ -38,7 +38,20 @@
   until: docker_pkg_installed.changed
   notify:
   - Restart Docker
+
+- name: Copy nuke-docker-bridge.service
+  copy:
+    src: nuke-docker-bridge.service
+    dest: /etc/systemd/system/nuke-docker-bridge.service
+  notify:
+  - Reload SystemD
   
+- name: Copy nuke_docker.sh
+  copy:
+    src: nuke_docker.sh
+    dest: /usr/bin/nuke_docker.sh
+    mode: 0755    
+    
 - name: Copy docker.service
   sudo: yes
   copy:
@@ -58,8 +71,15 @@
 - name: Adjust DOCKER_NETWORK
   lineinfile:
     dest: /etc/default/docker
-    line: "DOCKER_NETWORK=' --bridge=docker-ovs --fixed-cidr={{ docker_subnet }} --icc=false'"
+    line: "DOCKER_NETWORK='--fixed-cidr={{ docker_subnet }} --icc=false'"
   notify:
   - Restart Docker
   
 - meta: flush_handlers
+
+- name: Nuke Docker bridge for network isolation
+  service:
+    enabled: yes
+    name: nuke-docker-bridge
+    state: started
+  when: docker_pkg_installed.changed

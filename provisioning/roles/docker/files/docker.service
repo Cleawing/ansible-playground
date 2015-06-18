@@ -1,8 +1,8 @@
 [Unit]
 Description=Docker Application Container Engine
 Documentation=http://docs.docker.com
-After=network.target docker.socket
-Requires=docker.socket
+After=network.target docker.socket openvswitch-switch.service
+Requires=docker.socket openvswitch-switch.service
 
 [Service]
 EnvironmentFile=/etc/default/docker
