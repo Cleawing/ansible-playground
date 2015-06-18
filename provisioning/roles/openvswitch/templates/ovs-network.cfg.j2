@@ -17,25 +17,20 @@ iface gre{{ loop.index }} inet manual
     ovs_extra set interface ${IFACE} type=ipsec_gre options:remote_ip={{ host }} options:psk={{ ovs_psk }}
 {% endfor %}
 
-auto internal-ovs=internal-ovs
-allow-br0 internal-ovs
-iface internal-ovs inet manual
-    ovs_type OVSIntPort
-    ovs_bridge br0
-
-auto docker-ovs=docker-ovs
-allow-br0 docker-ovs
-iface docker-ovs inet manual
-    ovs_type OVSIntPort
-    ovs_bridge br0
-        
 auto docker-ovs=docker-ovs
 iface docker-ovs inet static
     address {{ docker_bridge_ip }}
     network {{ docker_network }}
     netmask 255.255.0.0
+    bridge_ports br0
     mtu 1462
 
+auto internal-ovs=internal-ovs
+allow-br0 internal-ovs
+iface internal-ovs inet manual
+    ovs_type OVSIntPort
+    ovs_bridge br0
+    
 auto internal-ovs=internal-ovs
 iface internal-ovs inet static
     address {{ internal_bridge_ip }}
