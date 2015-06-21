@@ -9,6 +9,7 @@
     pkg: "{{item}}"
     state: present
     update_cache: yes
+    install_recommends: no
   with_items:
     - bridge-utils 
     - openvswitch-switch
@@ -24,17 +25,6 @@
     enabled: yes
     name: racoon
     state: started
+  when: ovs_pkg_installed.changed
     
-- name: Upload /etc/network/interfaces.d/ovs-network.cfg template
-  template:
-    src: ovs-network.cfg.j2
-    dest: /etc/network/interfaces.d/ovs-network.cfg
-    
-- name: Restart Networking
-  service:
-    name: networking
-    state: restarted
-    
-- name: Set VLAN for br0
-  command: ovs-vsctl set port br0 tag=100
     

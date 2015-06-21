@@ -1,0 +1,7 @@
+---
+- name: Upload /etc/network/interfaces.d/ovs-network.cfg template
+  template:
+    src: ovs-network.cfg.j2
+    dest: /etc/network/interfaces.d/ovs-network.cfg
+  notify: Restart Networking
+

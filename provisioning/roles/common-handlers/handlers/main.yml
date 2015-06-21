@@ -1,8 +1,12 @@
 ---
 - name: Restart Network
-  sudo: yes
   service:
     name: systemd-networkd
+    state: restarted
+    
+- name: Restart Networking
+  service:
+    name: networking
     state: restarted
 
 - name: Reload SystemD
