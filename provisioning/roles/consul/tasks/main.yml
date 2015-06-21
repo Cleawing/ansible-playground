@@ -25,7 +25,7 @@
   sudo: yes
   template:
     src: consul_master.env.j2
-    dest: "/etc/consul_master.env"
+    dest: /etc/consul_master.env
     mode: 0600
   register: consul_master_env
   when: consul_master_mode 
@@ -36,7 +36,7 @@
   sudo: yes
   template:
     src: consul_slave.env.j2
-    dest: "/etc/consul_slave.env"
+    dest: /etc/consul_slave.env
     mode: 0600
   register: consul_slave_env
   when: not consul_master_mode 
@@ -58,3 +58,5 @@
   when: consul_master_env.changed or consul_slave_env.changed or consul_master_service.changed or consul_slave_service.changed
   register: consul_image_pulled
   until: consul_image_pulled.changed
+  
+- meta: flush_handlers

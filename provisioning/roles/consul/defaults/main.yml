@@ -18,11 +18,22 @@ consul_slave_node_index: "
       {%- endif -%}
     {%- endfor -%}
 "
-consul_master_host_name: "{{ consul_master_node_index }}.master.consul"
-consul_slave_host_name: "{{ consul_slave_node_index }}.slave.consul"
+
+consul_join_peers: "
+  {%- set join_peers = [] -%}
+  {%- for host in groups[consul_master_group] -%}
+    {%- if host != inventory_hostname -%}
+      {% do join_peers.append('10.127.0.%s' % loop.index ) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ join_peers | join(' ') }}"
+  
+consul_master_name: "{{ consul_master_node_index }}.master.consul"
+consul_master_cidr: "10.127.0.{{ consul_master_node_index }}/16"
+consul_slave_name: "{{ consul_slave_node_index }}.slave.consul"
+consul_slave_cidr: "10.127.1.{{ consul_slave_node_index }}/16"
 
 consul_retry_join: " 
-  {{ master_join_peers.split(',') | join(' -retry-join ') }}"
+  {{ consul_join_peers.split(' ') | join(' -retry-join ') }}"
   
 consul_master_args: "-server -bootstrap-expect {{ groups[consul_master_group] | length }}"
-consul_bridge_ip: "{{ weave_bridge_ip | replace('/16', '') }}"

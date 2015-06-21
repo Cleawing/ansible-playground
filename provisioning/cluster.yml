@@ -6,13 +6,13 @@
     - weave-install
     - weave-networking
 
-#- hosts: masters
-#  roles:
-#    - { role: consul, consul_master_mode: true }
+- hosts: masters
+  roles:
+    - { role: consul, consul_master_mode: true }
 #    - zookeeper
 #    - { role: mesos, mesos_master_mode: true }
     
-#- hosts: slaves
-#  roles:
-#    - { role: consul, consul_master_mode: false }
+- hosts: slaves
+  roles:
+    - { role: consul, consul_master_mode: false }
 #    - { role: mesos, mesos_master_mode: false }

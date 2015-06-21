@@ -1,8 +1,8 @@
 [Unit]
-After=openvswitch-switch.service
+After=weave.service
 Description=Mesos Slave Node
 Documentation=https://github.com/sekka1/mesosphere-docker
-After=openvswitch-switch.service
+After=weave.service
 
 [Service]
 Restart=always

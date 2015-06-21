@@ -14,15 +14,16 @@
   notify:
   - Reload SystemD
   
-- name: Upload env templates
+- name: Upload weave templates
   template:
-    src: "{{ item }}.env.j2"
-    dest: "/etc/{{ item }}.env"
+    src: "{{ item }}.j2"
+    dest: "/etc/{{ item }}"
     mode: 0600
   with_items:
-  - weave
-  - weave-nginx
-  register: weave_env
+  - weave.env
+  - weave-nginx.env
+  - weave-nginx.conf
+  register: weave_templates
   
 - name: Copy Weave services
   copy:
@@ -36,20 +37,14 @@
   register: weave_services
   notify:
   - Reload SystemD
-  
-- name: Copy weave-nginx.conf
-  copy:
-    src: weave-nginx.conf
-    dest: /etc/weave-nginx.conf
-    mode: 0600
     
-- name: Upload /etc/weave-nginx.env template
-  template:
-    src: weave-nginx.env.j2
-    dest: /etc/weave-nginx.env
-    mode: 0600
-  register: weave_nginx_env
-      
+- name: Adjust DOCKER_NETWORK
+  lineinfile:
+    dest: /etc/default/docker
+    line: 'DOCKER_NETWORK="{{ weave_docker_opts}}"'
+  notify:
+  - Restart Docker
+  
 - meta: flush_handlers
 
 - name: Restart Weave Services
@@ -62,7 +57,7 @@
   - weave-dns
   - weave-proxy
   - weave-proxy-nginx
-  when: weave_services.changed or weave_env.changed or weave_nginx_env.changed
+  when: weave_services.changed or weave_templates.changed
   notify:
   - Waiting for Weave Router
   - Waiting for Weave Proxy
@@ -71,4 +66,4 @@
   sudo: no
   lineinfile:  
     dest: "~/.profile"
-    line: "export DOCKER_HOST='unix:///var/run/weave-proxy.sock'"
+    line: "export DOCKER_HOST='unix://{{ weave_unix_socket }}'"

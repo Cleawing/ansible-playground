@@ -10,11 +10,11 @@ events {
 
 stream {
 	upstream weave-proxy {
-		server 127.0.0.1:12375;
+		server 127.0.0.1:12375 max_fails=5;
 	}
 	
 	server {
-		listen unix:/var/run/weave-proxy.sock;
+		listen unix:{{ weave_unix_socket }};
 		proxy_pass weave-proxy;
 	}
 }
