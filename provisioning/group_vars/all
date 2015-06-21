@@ -1,3 +1,4 @@
+nginx_version: 1.9.2
 weave_group: "weave_nodes"
 weave_node_index: "
     {%- for host in groups[weave_group] -%}
@@ -7,7 +8,6 @@ weave_node_index: "
     {%- endfor -%}
 "
 weave_bridge_ip: "10.2.0.{{ weave_node_index }}/16"
-
 
 master_join_peers: "
     {%- set join_peers = [] -%}

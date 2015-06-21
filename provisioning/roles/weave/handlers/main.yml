@@ -1,6 +1,0 @@
----
-- name: Waiting for Weave Router
-  wait_for:
-    port: 6783
-    timeout: 60
-    

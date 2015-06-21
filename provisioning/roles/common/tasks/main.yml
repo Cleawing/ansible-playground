@@ -1,4 +1,15 @@
 ---
+- name: Install common packages
+  apt:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+    install_recommends: no
+    cache_valid_time: 1800 
+  with_items:
+  - bridge-utils
+  register: pkg_installed
+    
 - name: Disable RPCBind
   service:
     enabled: no

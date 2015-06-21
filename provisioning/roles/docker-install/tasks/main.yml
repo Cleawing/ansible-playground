@@ -1,0 +1,53 @@
+---
+- name: Check that Docker installed
+  shell: "docker version"
+  ignore_errors: True
+  register: docker_installed
+  
+- name: Add apt-key
+  apt_key:
+    keyserver: p80.pool.sks-keyservers.net
+    id: 36A1D7869245C8950F966E92D8576A8BA88D21E9
+    state: present
+  when: docker_installed | failed
+  register: key_added
+  until: key_added | success
+  
+- name: Add Docker repo
+  apt_repository:
+    repo: deb http://get.docker.io/ubuntu docker main
+    state: present
+  when: docker_installed | failed
+    
+- name: Install packages
+  apt:
+    pkg: "lxc-docker={{docker_version}}"
+    state: present
+    update_cache: yes
+    install_recommends: no
+    cache_valid_time: 1800 
+  when: docker_installed | failed
+  register: docker_pkg_installed
+  until: docker_pkg_installed | success
+  notify:
+  - Restart Docker
+    
+- name: Copy Docker systemd files docker.service
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  with_items:
+  - docker.service
+#  - docker.socket
+  notify:
+  - Reload SystemD
+  - Restart Docker
+  
+- name: Adjust DOCKER_STORAGE
+  lineinfile:
+    dest: /etc/default/docker
+    line: 'DOCKER_STORAGE="-s overlay"'
+  notify:
+  - Restart Docker
+  
+- meta: flush_handlers

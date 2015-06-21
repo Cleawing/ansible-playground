@@ -1,0 +1,74 @@
+---
+- name: Copy 10-weave.network
+  copy:
+    src: 10-weave.network
+    dest: /etc/systemd/network/10-weave.network
+  notify:
+  - Restart Network
+  
+- name: Copy weave-network.target
+  copy:
+    src: weave-network.target
+    dest: /etc/systemd/system/weave-network.target
+  register: weave_network_target
+  notify:
+  - Reload SystemD
+  
+- name: Upload env templates
+  template:
+    src: "{{ item }}.env.j2"
+    dest: "/etc/{{ item }}.env"
+    mode: 0600
+  with_items:
+  - weave
+  - weave-nginx
+  register: weave_env
+  
+- name: Copy Weave services
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  with_items:
+  - weave.service
+  - weave-dns.service
+  - weave-proxy.service
+  - weave-proxy-nginx.service
+  register: weave_services
+  notify:
+  - Reload SystemD
+  
+- name: Copy weave-nginx.conf
+  copy:
+    src: weave-nginx.conf
+    dest: /etc/weave-nginx.conf
+    mode: 0600
+    
+- name: Upload /etc/weave-nginx.env template
+  template:
+    src: weave-nginx.env.j2
+    dest: /etc/weave-nginx.env
+    mode: 0600
+  register: weave_nginx_env
+      
+- meta: flush_handlers
+
+- name: Restart Weave Services
+  service:
+    enabled: yes
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+  - weave
+  - weave-dns
+  - weave-proxy
+  - weave-proxy-nginx
+  when: weave_services.changed or weave_env.changed or weave_nginx_env.changed
+  notify:
+  - Waiting for Weave Router
+  - Waiting for Weave Proxy
+  
+- name: Adjust ~/.profile
+  sudo: no
+  lineinfile:  
+    dest: "~/.profile"
+    line: "export DOCKER_HOST='unix:///var/run/weave-proxy.sock'"

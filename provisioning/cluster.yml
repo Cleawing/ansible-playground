@@ -1,12 +1,12 @@
 - hosts: all
   roles:
     - common
-    - openvswitch
-    - ovs-networking
-#    - docker
-#    - weave
+    - docker-install
+    - docker-common
+    - weave-install
+    - weave-networking
 
-- hosts: masters
+#- hosts: masters
 #  roles:
 #    - { role: consul, consul_master_mode: true }
 #    - zookeeper

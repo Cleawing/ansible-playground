@@ -1,0 +1,17 @@
+[Unit]
+After=weave-proxy.service
+Description=Nginx streaming from Weave Proxy tcp to unix socket (temporary workaround) 
+Documentation=http://docs.weave.works/
+Requires=weave-proxy.service
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=5min
+EnvironmentFile=/etc/weave-nginx.env
+ExecStartPre=-/usr/bin/docker rm -f nginx-weave
+ExecStart=/usr/bin/docker run --name nginx-weave --net="host" -v /etc/weave-nginx.conf:/etc/nginx/nginx.conf:ro -v /var/run:/var/run nginx:${NGINX_VERSION}
+ExecStop=/usr/bin/docker stop nginx-weave
+
+[Install]
+WantedBy=weave-network.target

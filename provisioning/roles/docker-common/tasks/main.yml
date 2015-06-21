@@ -1,0 +1,5 @@
+---
+- name: Pull common images
+  command: "docker pull {{ item }}"
+  with_items:
+  - "nginx:{{ nginx_version }}"
