@@ -1,15 +1,15 @@
 [Unit]
-After=weave.service
+After=weave-proxy-nginx.service
 Description=Mesos Slave Node
 Documentation=https://github.com/sekka1/mesosphere-docker
-After=weave.service
+Requires=weave-proxy-nginx.service
 
 [Service]
 Restart=always
 RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/mesos_slave.env
-ExecStartPre=-/usr/bin/docker kill mesos-slave
-ExecStartPre=-/usr/bin/docker rm -f mesos-slave
-ExecStart=/usr/bin/docker run --name mesos-slave --privileged -h ${MESOS_HOSTNAME} --net="host" -p ${BRIDGE_IP}:5051:5051 -v ${MESOS_LOG_DIR}:/var/log/mesos -v ${MESOS_WORK_DIR}:/tmp/mesos -v /sys:/sys -v /usr/bin/docker:/usr/bin/docker:ro -v /var/run/docker.sock:/var/run/docker.sock -e MESOS_IP=${BRIDGE_IP} -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e MESOS_CONTAINERIZERS=docker -e MESOS_MASTER=zk://${ZOOKEEPER_NODES}/mesos cleawing/mesos:${MESOS_VERSION} /opt/run-slave.sh
-ExecStop=-/usr/bin/docker stop mesos-slave
+ExecStartPre=-/usr/bin/docker stop $MESOS_NAME
+ExecStartPre=-/usr/bin/docker rm -f $MESOS_NAME
+ExecStart=/usr/bin/docker run --name $MESOS_NAME --privileged -v ${MESOS_LOG_DIR}:/var/log/mesos -v ${MESOS_WORK_DIR}:/tmp/mesos -v /sys:/sys -v /usr/bin/docker:/usr/bin/docker:ro -v ${MESOS_DOCKER_SOCK}:/var/run/docker.sock -e MESOS_IP=${MESOS_IP} -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e WEAVE_CIDR=${MESOS_CIDR} -e MESOS_CONTAINERIZERS=docker -e MESOS_MASTER=zk://${ZOOKEEPER_NODES}/mesos cleawing/mesos:${MESOS_VERSION} /opt/run-slave.sh
+ExecStop=-/usr/bin/docker stop $MESOS_NAME

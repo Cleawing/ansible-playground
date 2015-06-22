@@ -32,4 +32,4 @@
   command: "/usr/bin/docker pull cleawing/zookeeper:{{ zookeeper_version }}"
   when: zookeeper_service.changed or zookeeper_env.changed
   register: zookeper_image_pulled
-  until: zookeper_image_pulled.changed
+  until: zookeper_image_pulled | success
