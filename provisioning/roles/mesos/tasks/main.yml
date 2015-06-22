@@ -68,3 +68,5 @@
   when: mesos_master_service.changed or mesos_slave_service.changed or mesos_master_env.changed or mesos_slave_env.changed
   register: mesos_image_pulled
   until: mesos_image_pulled | success
+  
+- meta: flush_handlers
