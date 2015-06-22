@@ -1,0 +1,21 @@
+---
+marathon_version: 0.8.2
+marathon_group: marathon_nodes
+zookeeper_server_group: zookeeper_nodes
+
+marathon_node_index: "
+    {%- for host in groups[marathon_group] -%}
+      {%- if host == 'default' or host == inventory_hostname or host == ansible_fqdn or host in ansible_all_ipv4_addresses -%}
+        {{ loop.index }}
+      {%- endif -%}
+    {%- endfor -%}"
+       
+marathon_cidr: "10.127.5.{{ marathon_node_index }}/16"
+marathon_name: "{{ marathon_node_index }}.marathon"
+
+marathon_zookeeper_nodes: "
+  {%- set zookeeper_peers = [] -%}
+  {%- for host in groups[zookeeper_server_group] -%}
+    {% do zookeeper_peers.append('10.127.2.%s:2181' % loop.index) %}
+  {%- endfor -%}
+  {{ zookeeper_peers | join(',') }}"

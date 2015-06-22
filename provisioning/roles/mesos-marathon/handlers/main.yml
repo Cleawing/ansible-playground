@@ -1,0 +1,7 @@
+---
+- name: Restart Marathon
+  sudo: yes
+  service:
+    enabled: yes
+    name: marathon
+    state: restarted 

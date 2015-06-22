@@ -16,6 +16,7 @@
     - { role: consul, consul_master_mode: true }
     - zookeeper
     - { role: mesos, mesos_master_mode: true }
+    - mesos-marathon
     
 - hosts: slaves
   roles:

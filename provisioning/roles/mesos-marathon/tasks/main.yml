@@ -1,0 +1,28 @@
+---
+- name: Copy marathon.service
+  sudo: yes
+  copy:
+    src: marathon.service
+    dest: /etc/systemd/system/marathon.service
+  register: marathon_service
+  notify:
+  - Reload SystemD
+  - Restart Marathon
+  
+- name: Upload /etc/marathon.env template
+  sudo: yes
+  template:
+    src: marathon.env.j2
+    dest: /etc/marathon.env
+    mode: 0600
+  register: marathon_env
+  notify:
+  - Restart Marathon
+  
+- name: Docker pull image
+  command: "/usr/bin/docker pull cleawing/mesos-marathon:{{ marathon_version }}"
+  when: marathon_service.changed or marathon_env.changed
+  register: marathon_image_pulled
+  until: marathon_image_pulled | success
+  
+- meta: flush_handlers

@@ -213,7 +213,8 @@ Vagrant.configure("2") do |config|
             "consul_masters:children" => ["masters"],
             "consul_slaves:children" => ["slaves"],
             "mesos_masters:children" => ["masters"],
-            "mesos_slaves:children" => ["slaves"]
+            "mesos_slaves:children" => ["slaves"],
+            "marathon_nodes:children" => ["masters"]
           }
           ansible.playbook = "provisioning/cluster.yml"
         end
