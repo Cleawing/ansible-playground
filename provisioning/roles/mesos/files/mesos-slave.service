@@ -13,3 +13,6 @@ ExecStartPre=-/usr/bin/docker stop $MESOS_NAME
 ExecStartPre=-/usr/bin/docker rm -f $MESOS_NAME
 ExecStart=/usr/bin/docker run --name $MESOS_NAME --privileged -v ${MESOS_LOG_DIR}:/var/log/mesos -v ${MESOS_WORK_DIR}:/tmp/mesos -v /sys:/sys -v /usr/bin/docker:/usr/bin/docker:ro -v /lib64/libdevmapper.so.1.02:/lib/libdevmapper.so.1.02:ro -v ${MESOS_DOCKER_SOCK}:/var/run/docker.sock -e MESOS_IP=${MESOS_IP} -e MESOS_HOSTNAME=${MESOS_HOSTNAME} -e WEAVE_CIDR=${MESOS_CIDR} -e MESOS_CONTAINERIZERS=docker -e MESOS_MASTER=zk://${ZOOKEEPER_NODES}/mesos cleawing/mesos:${MESOS_VERSION} /opt/run-slave.sh
 ExecStop=-/usr/bin/docker stop $MESOS_NAME
+
+[Install]
+WantedBy=multi-user.target

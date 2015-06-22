@@ -1,8 +1,8 @@
 [Unit]
-After=zookeeper.service
+After=weave-proxy-nginx.service zookeeper.service
 Description=Marathon Framework for Mesos
 Documentation=https://github.com/sekka1/mesosphere-docker
-Requires=zookeeper.service
+Requires=weave-proxy-nginx.service zookeeper.service
 
 [Service]
 Restart=always
@@ -13,3 +13,6 @@ ExecStartPre=-/usr/bin/docker stop $MARATHON_NAME
 ExecStartPre=-/usr/bin/docker rm -f $MARATHON_NAME
 ExecStart=/usr/bin/docker run --name $MARATHON_NAME -e LIBPROCESS_PORT=9090 -e WEAVE_CIDR=${MARATHON_CIDR} cleawing/mesos-marathon:${MARATHON_VERSION} --master zk://${ZOOKEEPER_NODES}/mesos --zk zk://${ZOOKEEPER_NODES}/marathon --checkpoint --task_launch_timeout 300000
 ExecStop=-/usr/bin/docker stop $MARATHON_NAME
+
+[Install]
+WantedBy=multi-user.target

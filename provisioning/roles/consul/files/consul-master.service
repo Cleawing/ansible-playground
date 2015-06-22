@@ -3,7 +3,6 @@ After=weave-proxy-nginx.service
 Description=Consul Master Node
 Documentation=https://registry.hub.docker.com/u/progrium/consul/
 Requires=weave-proxy-nginx.service
-DefaultDependencies=no
 
 [Service]
 Restart=always
@@ -14,3 +13,6 @@ ExecStartPre=-/usr/bin/docker stop $CONSUL_NAME
 ExecStartPre=-/usr/bin/docker rm -f $CONSUL_NAME
 ExecStart=/usr/bin/docker run --name $CONSUL_NAME -v ${CONSUL_DATA}:/data -e WEAVE_CIDR=${CONSUL_CIDR} cleawing/consul:${CONSUL_VERSION} -advertise $CONSUL_IP $CONSUL_MASTER_ARGS -retry-join $CONSUL_RETRY_JOIN
 ExecStop=-/usr/bin/docker stop $CONSUL_NAME
+
+[Install]
+WantedBy=multi-user.target

@@ -13,3 +13,6 @@ ExecStartPre=-/usr/bin/docker stop $ZOOKEEPER_NAME
 ExecStartPre=-/usr/bin/docker rm -f $ZOOKEEPER_NAME
 ExecStart=/usr/bin/docker run --name $ZOOKEEPER_NAME -v ${ZOOKEEPER_DATA}:/tmp/zookeeper -e WEAVE_CIDR=${ZOOKEEPER_CIDR} $ZOOKEEPER_DOCKER_ARGS cleawing/zookeeper:${ZOOKEEPER_VERSION}
 ExecStop=-/usr/bin/docker stop $ZOOKEEPER_NAME
+
+[Install]
+WantedBy=multi-user.target

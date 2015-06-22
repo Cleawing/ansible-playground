@@ -51,13 +51,25 @@
   
 - meta: flush_handlers
 
-- name: Restart Weave Services
+- name: Enable Weave Services
   sudo: yes
   service:
     enabled: yes
     name: "{{ item }}"
+  with_items:
+  - weave-network.target
+  - weave
+  - weave-dns
+  - weave-proxy
+  - weave-proxy-nginx
+
+- name: Restart Weave Services
+  sudo: yes
+  service:
+    name: "{{ item }}"
     state: restarted
   with_items:
+  - weave-network.target
   - weave
   - weave-dns
   - weave-proxy
@@ -66,11 +78,17 @@
   notify:
   - Waiting for Weave Router
   - Waiting for Weave Proxy
+
+- name: Touch /etc/profile.d/docker_host.sh
+  sudo: yes
+  file: 
+    path: /etc/profile.d/docker_host.sh
+    state: touch
   
-#- name: Adjust /home/core/.bashrc
-#  sudo: yes
-#  lineinfile:  
-#    dest: "/home/core/.bashrc"
-#    line: "export DOCKER_HOST='unix://{{ weave_unix_socket }}'"
+- name: Adjust /etc/profile.d/docker_host.sh
+  sudo: yes
+  lineinfile:  
+    dest: /etc/profile.d/docker_host.sh
+    line: "export DOCKER_HOST='unix://{{ weave_unix_socket }}'"
     
 - meta: flush_handlers

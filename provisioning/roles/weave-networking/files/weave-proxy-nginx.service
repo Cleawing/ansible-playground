@@ -10,6 +10,8 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/weave-nginx.env
 ExecStartPre=-/usr/bin/docker rm -f nginx-weave
+ExecStartPre=-/usr/bin/rm /var/run/weave.sock
+ExecStartPre=-/usr/bin/rmdir /var/run/weave.sock
 ExecStart=/usr/bin/docker run --name nginx-weave --net="host" -v /etc/weave-nginx.conf:/etc/nginx/nginx.conf:ro -v /var/run:/var/run nginx:${NGINX_VERSION}
 ExecStop=-/usr/bin/docker stop nginx-weave
 
