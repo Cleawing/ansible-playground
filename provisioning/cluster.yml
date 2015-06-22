@@ -1,7 +1,12 @@
 - hosts: all
+  gather_facts: False
   roles:
-    - common
-    - docker-install
+    - coreos-bootstrap
+    
+- hosts: all
+  roles:
+#    - common
+#    - docker-install
     - docker-common
     - weave-install
     - weave-networking
@@ -9,10 +14,10 @@
 - hosts: masters
   roles:
     - { role: consul, consul_master_mode: true }
-#    - zookeeper
-#    - { role: mesos, mesos_master_mode: true }
+    - zookeeper
+    - { role: mesos, mesos_master_mode: true }
     
 - hosts: slaves
   roles:
     - { role: consul, consul_master_mode: false }
-#    - { role: mesos, mesos_master_mode: false }
+    - { role: mesos, mesos_master_mode: false }

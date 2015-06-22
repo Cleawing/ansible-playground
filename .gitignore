@@ -1,4 +1,3 @@
 .vagrant/*
 user-data
-provisioning/playbooks/roles/defunctzombie.coreos-bootstrap/*
 provisioning/playbooks/credentials/*_password

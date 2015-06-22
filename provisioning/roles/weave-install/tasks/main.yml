@@ -1,15 +1,19 @@
 ---
+- name: Ensure that Weave directory exists
+  sudo: yes
+  file: path=/opt/weave/bin state=directory mode=0755
+
 - name: Update Weave script
+  sudo: yes
   get_url:
     url: http://git.io/weave
-    dest: /usr/local/bin/weave
+    dest: /opt/weave/bin/weave
     mode: 0755
   register: weave_updated
-  register: weave_updated 
   until: weave_updated | success
   
 - name: Setup Weave
-  command: /usr/local/bin/weave setup
+  command: /opt/weave/bin/weave setup
   when: weave_updated | changed
   register: weave_installed 
   until: weave_installed | success

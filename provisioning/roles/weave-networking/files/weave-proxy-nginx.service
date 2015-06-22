@@ -3,7 +3,6 @@ After=weave-proxy.service
 Description=Nginx streaming from Weave Proxy tcp to unix socket (temporary workaround) 
 Documentation=http://docs.weave.works/
 Requires=weave-proxy.service
-DefaultDependencies=no
 
 [Service]
 Restart=always

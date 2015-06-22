@@ -1,5 +1,6 @@
 ---
 - name: Copy 10-weave.network
+  sudo: yes
   copy:
     src: 10-weave.network
     dest: /etc/systemd/network/10-weave.network
@@ -7,6 +8,7 @@
   - Restart Network
   
 - name: Copy weave-network.target
+  sudo: yes
   copy:
     src: weave-network.target
     dest: /etc/systemd/system/weave-network.target
@@ -15,6 +17,7 @@
   - Reload SystemD
   
 - name: Upload weave templates
+  sudo: yes
   template:
     src: "{{ item }}.j2"
     dest: "/etc/{{ item }}"
@@ -26,6 +29,7 @@
   register: weave_templates
   
 - name: Copy Weave services
+  sudo: yes
   copy:
     src: "{{ item }}"
     dest: "/etc/systemd/system/{{ item }}"
@@ -38,16 +42,17 @@
   notify:
   - Reload SystemD
     
-- name: Adjust DOCKER_NETWORK
-  lineinfile:
-    dest: /etc/default/docker
-    line: 'DOCKER_NETWORK="{{ weave_docker_opts}}"'
-  notify:
-  - Restart Docker
+#- name: Adjust DOCKER_NETWORK
+#  lineinfile:
+#    dest: /etc/default/docker
+#    line: 'DOCKER_NETWORK="{{ weave_docker_opts}}"'
+#  notify:
+#  - Restart Docker
   
 - meta: flush_handlers
 
 - name: Restart Weave Services
+  sudo: yes
   service:
     enabled: yes
     name: "{{ item }}"
@@ -62,10 +67,10 @@
   - Waiting for Weave Router
   - Waiting for Weave Proxy
   
-- name: Adjust ~/.profile
-  sudo: no
-  lineinfile:  
-    dest: "~/.profile"
-    line: "export DOCKER_HOST='unix://{{ weave_unix_socket }}'"
+#- name: Adjust /home/core/.bashrc
+#  sudo: yes
+#  lineinfile:  
+#    dest: "/home/core/.bashrc"
+#    line: "export DOCKER_HOST='unix://{{ weave_unix_socket }}'"
     
 - meta: flush_handlers
