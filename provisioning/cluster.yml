@@ -9,7 +9,7 @@
 - hosts: masters
   roles:
     - { role: consul, consul_master_mode: true }
-#    - zookeeper
+    - zookeeper
 #    - { role: mesos, mesos_master_mode: true }
     
 - hosts: slaves

@@ -1,8 +1,8 @@
 [Unit]
-After=weave.service
+After=weave-proxy-nginx.service
 Description=Consul Slave Node
 Documentation=https://registry.hub.docker.com/u/progrium/consul/
-Requires=weave.service
+Requires=weave-proxy-nginx.service
 
 [Service]
 Restart=always
@@ -11,5 +11,5 @@ TimeoutStartSec=5min
 EnvironmentFile=/etc/consul_slave.env
 ExecStartPre=-/usr/bin/docker stop $CONSUL_NAME
 ExecStartPre=-/usr/bin/docker rm -f $CONSUL_NAME
-ExecStart=/usr/bin/docker run --name $CONSUL_NAME -v ${CONSUL_DATA}:/data -e WEAVE_CIDR=${CONSUL_CIDR} cleawing/consul:${CONSUL_VERSION} -advertise $CONSUL_ADVERTISE -retry-join $CONSUL_RETRY_JOIN
+ExecStart=/usr/bin/docker run --name $CONSUL_NAME -v ${CONSUL_DATA}:/data -e WEAVE_CIDR=${CONSUL_CIDR} cleawing/consul:${CONSUL_VERSION} -advertise $CONSUL_IP -retry-join $CONSUL_RETRY_JOIN
 ExecStop=-/usr/bin/docker stop $CONSUL_NAME

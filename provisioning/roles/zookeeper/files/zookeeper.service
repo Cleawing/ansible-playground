@@ -1,14 +1,15 @@
 [Unit]
-After=openvswitch-switch.service
+After=weave-proxy-nginx.service
 Description=Zookeeper Node
 Documentation=https://github.com/sekka1/mesosphere-docker
-After=openvswitch-switch.service
+Requires=weave-proxy-nginx.service
 
 [Service]
 Restart=always
 RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/zookeeper.env
-ExecStartPre=-/usr/bin/docker rm -f zookeeper
-ExecStart=/usr/bin/docker run --name zookeeper -h ${ZOOKEEPER_HOST_NAME} -v ${ZOOKEEPER_DATA}:/tmp/zookeeper -p ${BRIDGE_IP}:2181:2181 -p ${BRIDGE_IP}:2888:2888 -p ${BRIDGE_IP}:3888:3888 $ZOOKEEPER_DOCKER_ARGS cleawing/zookeeper:${ZOOKEEPER_VERSION}
-ExecStop=-/usr/bin/docker stop zookeeper
+ExecStartPre=-/usr/bin/docker stop $ZOOKEEPER_NAME
+ExecStartPre=-/usr/bin/docker rm -f $ZOOKEEPER_NAME
+ExecStart=/usr/bin/docker run --name $ZOOKEEPER_NAME -v ${ZOOKEEPER_DATA}:/tmp/zookeeper -e WEAVE_CIDR=${ZOOKEEPER_CIDR} $ZOOKEEPER_DOCKER_ARGS cleawing/zookeeper:${ZOOKEEPER_VERSION}
+ExecStop=-/usr/bin/docker stop $ZOOKEEPER_NAME
