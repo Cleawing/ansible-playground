@@ -3,6 +3,7 @@ After=weave-proxy-nginx.service
 Description=Consul Slave Node
 Documentation=https://registry.hub.docker.com/u/progrium/consul/
 Requires=weave-proxy-nginx.service
+DefaultDependencies=no
 
 [Service]
 Restart=always

@@ -67,3 +67,5 @@
   lineinfile:  
     dest: "~/.profile"
     line: "export DOCKER_HOST='unix://{{ weave_unix_socket }}'"
+    
+- meta: flush_handlers

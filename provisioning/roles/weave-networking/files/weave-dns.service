@@ -3,6 +3,7 @@ After=weave.service
 Description=Weave Network DNS
 Documentation=http://docs.weave.works/
 Requires=weave.service
+DefaultDependencies=no
 
 [Service]
 Restart=always
@@ -10,10 +11,11 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/weave.env
 ExecStartPre=-/usr/local/bin/weave stop-dns
+ExecStartPre=-/usr/bin/docker rm -f weavedns
 ExecStartPre=/usr/local/bin/weave launch-dns
 ExecStart=/usr/bin/docker logs -f weavedns
 SuccessExitStatus=2
-ExecStop=/usr/local/bin/weave stop-dns
+ExecStop=-/usr/local/bin/weave stop-dns
 
 [Install]
 WantedBy=weave-network.target

@@ -1,8 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-$master_num_instances=3
-$slave_num_instances=2
+$master_num_instances=2
+$slave_num_instances=1
 $master_instance_name_prefix = "master"
 $slave_instance_name_prefix = "slave"
 $vm_gui = false

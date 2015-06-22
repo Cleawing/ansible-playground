@@ -3,6 +3,7 @@ After=weave.service
 Description=Weave Network Proxy
 Documentation=http://docs.weave.works/
 Requires=weave.service
+DefaultDependencies=no
 
 [Service]
 Restart=always
@@ -10,10 +11,11 @@ RestartSec=10
 TimeoutStartSec=5min
 EnvironmentFile=/etc/weave.env
 ExecStartPre=-/usr/local/bin/weave stop-proxy
+ExecStartPre=-/usr/bin/docker rm -f weaveproxy
 ExecStartPre=/usr/local/bin/weave launch-proxy -H tcp://127.0.0.1:12375
 ExecStart=/usr/bin/docker logs -f weaveproxy
 SuccessExitStatus=2
-ExecStop=/usr/local/bin/weave stop-proxy
+ExecStop=-/usr/local/bin/weave stop-proxy
 
 [Install]
 WantedBy=weave-network.target
