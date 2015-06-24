@@ -1,2 +1,2 @@
-# Inception
-## Intelligent cloud management
+# Ansible Playground
+## Roles and playbooks. Just for research.
