@@ -21,14 +21,14 @@ mesos_slave_node_index: "
     {%- endfor -%}"
        
 mesos_master_name: "{{ mesos_master_node_index }}.master.mesos"
-mesos_master_cidr: "10.127.3.{{ mesos_master_node_index }}/16"
+mesos_master_cidr: "10.128.3.{{ mesos_master_node_index }}/16"
 mesos_slave_name: "{{ mesos_slave_node_index }}.slave.mesos"
-mesos_slave_cidr: "10.127.4.{{ mesos_slave_node_index }}/16"
+mesos_slave_cidr: "10.128.4.{{ mesos_slave_node_index }}/16"
 
 mesos_zookeeper_nodes: "
   {%- set zookeeper_peers = [] -%}
   {%- for host in groups[zookeeper_server_group] -%}
-    {% do zookeeper_peers.append('10.127.2.%s:2181' % loop.index) %}
+    {% do zookeeper_peers.append('10.128.2.%s:2181' % loop.index) %}
   {%- endfor -%}
   {{ zookeeper_peers | join(',') }}"
 mesos_quorum: 1

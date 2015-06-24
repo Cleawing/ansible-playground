@@ -1,2 +1,3 @@
 nginx_version: 1.9.2
 weave_unix_socket: /var/run/weave.sock
+weave_system_subnet: "net:10.128.0.0/16"

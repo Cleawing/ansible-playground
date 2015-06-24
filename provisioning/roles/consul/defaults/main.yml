@@ -23,15 +23,15 @@ consul_join_peers: "
   {%- set join_peers = [] -%}
   {%- for host in groups[consul_master_group] -%}
     {%- if host != inventory_hostname -%}
-      {% do join_peers.append('10.127.0.%s' % loop.index ) %}
+      {% do join_peers.append('10.128.0.%s' % loop.index ) %}
     {%- endif -%}
   {%- endfor -%}
   {{ join_peers | join(' ') }}"
   
 consul_master_name: "{{ consul_master_node_index }}.master.consul"
-consul_master_cidr: "10.127.0.{{ consul_master_node_index }}/16"
+consul_master_cidr: "10.128.0.{{ consul_master_node_index }}/16"
 consul_slave_name: "{{ consul_slave_node_index }}.slave.consul"
-consul_slave_cidr: "10.127.1.{{ consul_slave_node_index }}/16"
+consul_slave_cidr: "10.128.1.{{ consul_slave_node_index }}/16"
 
 consul_retry_join: " 
   {{ consul_join_peers.split(' ') | join(' -retry-join ') }}"

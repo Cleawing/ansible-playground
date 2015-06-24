@@ -10,12 +10,12 @@ marathon_node_index: "
       {%- endif -%}
     {%- endfor -%}"
        
-marathon_cidr: "10.127.5.{{ marathon_node_index }}/16"
+marathon_cidr: "10.128.5.{{ marathon_node_index }}/16"
 marathon_name: "{{ marathon_node_index }}.marathon"
 
 marathon_zookeeper_nodes: "
   {%- set zookeeper_peers = [] -%}
   {%- for host in groups[zookeeper_server_group] -%}
-    {% do zookeeper_peers.append('10.127.2.%s:2181' % loop.index) %}
+    {% do zookeeper_peers.append('10.128.2.%s:2181' % loop.index) %}
   {%- endfor -%}
   {{ zookeeper_peers | join(',') }}"

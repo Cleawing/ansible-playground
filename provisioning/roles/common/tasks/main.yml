@@ -1,7 +1,11 @@
 ---
-- name: Ensure that /etc/profile.d/ exists
+- name: Ensure that directories is exists
   sudo: yes
   file:
-    path: /etc/profile.d
+    path: "{{ item }}"
     state: directory
-    mode: 0755    
+    mode: 0755
+  with_items:
+  - /etc/profile.d
+  - /etc/systemd/system/docker.service.d
+  - /opt/bin  

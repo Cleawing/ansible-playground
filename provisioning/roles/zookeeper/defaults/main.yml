@@ -10,12 +10,12 @@ zookeeper_node_index: "
     {%- endfor -%}
 "
 zookeeper_name: "{{ zookeeper_node_index }}.zookeeper"
-zookeeper_cidr: "10.127.2.{{ consul_master_node_index }}/16"
+zookeeper_cidr: "10.128.2.{{ consul_master_node_index }}/16"
 
 zookeeper_nodes_env: "
   {%- set zookeeper_peers = [] -%}
   {%- for host in groups[zookeeper_server_group] -%}
-    {% do zookeeper_peers.append('ADDITIONAL_ZOOKEEPER_%s=server.%s=10.127.2.%s:2888:3888' % (loop.index, loop.index, loop.index)) %}
+    {% do zookeeper_peers.append('ADDITIONAL_ZOOKEEPER_%s=server.%s=10.128.2.%s:2888:3888' % (loop.index, loop.index, loop.index)) %}
   {%- endfor -%}
   {{ zookeeper_peers | join(' -e ') }}"
 zookeeper_docker_args: "-e SERVER_ID={{ zookeeper_node_index }} -e {{ zookeeper_nodes_env }}"

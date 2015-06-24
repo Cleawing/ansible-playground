@@ -41,13 +41,15 @@
   register: weave_services
   notify:
   - Reload SystemD
-    
-#- name: Adjust DOCKER_NETWORK
-#  lineinfile:
-#    dest: /etc/default/docker
-#    line: 'DOCKER_NETWORK="{{ weave_docker_opts}}"'
-#  notify:
-#  - Restart Docker
+  
+- name: Adjust DOCKER_OPTS
+  sudo: yes
+  template:
+    src: 10-weave.conf.j2
+    dest: /etc/systemd/system/docker.service.d/10-weave.conf
+    mode: 0600
+  notify:
+  - Restart Docker
   
 - meta: flush_handlers
 

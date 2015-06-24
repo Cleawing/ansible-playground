@@ -1,8 +1,8 @@
 [Unit]
-After=weave-proxy.service
+After=weave.service
 Description=Weave Network DNS
 Documentation=http://docs.weave.works/
-Requires=weave-proxy.service
+Requires=weave.service
 
 [Service]
 Restart=always
